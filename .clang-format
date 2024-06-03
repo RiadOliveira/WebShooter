@@ -1,0 +1,13 @@
+{
+  BasedOnStyle: Google,
+  SpaceBeforeParens: Never,
+  PointerAlignment: Left,
+  IndentWidth: 2,
+  ContinuationIndentWidth: 2,
+  AlignAfterOpenBracket: BlockIndent,
+  ConstructorInitializerIndentWidth: 2,
+  AllowShortIfStatementsOnASingleLine: AllIfsAndElse,
+  BreakConstructorInitializers: AfterColon,
+  PackConstructorInitializers: BinPack,
+  SpaceBeforeCtorInitializerColon: false
+}

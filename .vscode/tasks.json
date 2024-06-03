@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "make debug",
+      "type": "shell",
+      "command": "make",
+      "problemMatcher": "$gcc",
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/debug"
+      }
+    },
+    {
+      "label": "make release",
+      "type": "shell",
+      "command": "make",
+      "problemMatcher": "$gcc",
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/release"
+      }
+    },
+    {
+      "label": "cmake debug",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "../"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}/debug"
+      },
+    },
+    {
+      "label": "cmake release",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "../"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}/release"
+      }
+    }
+  ],
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": true,
+    "panel": "shared",
+    "showReuseMessage": true,
+    "clear": true,
+    "revealProblems": "onProblem",
+    "close": false
+  }
+}

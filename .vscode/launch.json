@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/debug/webShooter",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "preLaunchTask": "make debug",
+    },
+    {
+      "name": "Release",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/release/webShooter",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "preLaunchTask": "make release"
+    }
+  ]
+}
