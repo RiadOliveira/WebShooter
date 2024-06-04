@@ -2,20 +2,20 @@
 
 const char* USAGE_INSTRUCTIONS_GENERAL = "Usage: wst [options] <arguments>\n";
 const char* USAGE_INSTRUCTIONS_WEB =
-  "wst -w <output_file> <content1> <content2> ...\n";
-const char* USAGE_INSTRUCTIONS_UNWEB = "wst -u <file_to_unweb>\n";
+  "Usage: wst -w <output_archive> <content1> <content2> ...\n";
+const char* USAGE_INSTRUCTIONS_UNWEB =
+  "Usage: wst -u <archive_to_unweb1> <archive_to_unweb2> ...\n";
 const char* HELP_MENU =
-  "Usage: wst [options] <arguments>\n"
-  "Description: WebShooter is a tool to web files and folders into or "
+  "%sDescription: WebShooter is a tool to web files and folders into or "
   "unweb from a single archive.\n\n"
   "Options:\n"
   "  -w, --web\tWeb files or folders into a single archive.\n"
   "\t\tRequires an output file and one or more contents (files or folders).\n"
-  "\t\tUsage: wst -w <output_file> <content1> <content2> ...\n\n"
-  "  -u, --unweb\tUnweb a previously webbed archive into its original "
+  "\t\t%s\n"
+  "  -u, --unweb\tUnweb previously webbed archives into their original "
   "contents.\n"
-  "\t\tRequires an input file to be unwebbed.\n"
-  "\t\tUsage: wst -u <file_to_unweb>\n\n"
+  "\t\tRequires one or more input archives to be unwebbed.\n"
+  "\t\t%s\n"
   "  -h, --help\tShow this help message.\n";
 
 bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
@@ -34,8 +34,8 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
       bool hasOutputFileAndAtLeastOneContent = quantityOfContents >= 2;
       if(!hasOutputFileAndAtLeastOneContent) {
         printErrorMessage(
-          "Insufficient contents passed to perform Web operation! At least "
-          "two contents are required: <output_file> <content>\n\nUsage: %s",
+          "Insufficient arguments passed to perform Web operation! At least "
+          "two arguments are required: <output_archive> <content>\n\n%s",
           USAGE_INSTRUCTIONS_WEB
         );
       }
@@ -46,8 +46,8 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
       bool hasFileToUnweb = quantityOfContents >= 1;
       if(!hasFileToUnweb) {
         printErrorMessage(
-          "Insufficient contents passed to perform Unweb operation! At least "
-          "one content is required: <file_to_unweb>\n\nUsage: %s",
+          "Insufficient arguments passed to perform Unweb operation! At least "
+          "one argument is required: <archive_to_unweb>\n\n%s",
           USAGE_INSTRUCTIONS_UNWEB
         );
       }
@@ -58,7 +58,12 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
   }
 }
 
-inline void printHelpMenu() { printf("%s", HELP_MENU); }
+inline void printHelpMenu() {
+  printf(
+    HELP_MENU, USAGE_INSTRUCTIONS_GENERAL, USAGE_INSTRUCTIONS_WEB,
+    USAGE_INSTRUCTIONS_UNWEB
+  );
+}
 
 inline void freeArguments(ParsedArguments* arguments) {
   free(arguments->contents);

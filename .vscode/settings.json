@@ -6,6 +6,8 @@
     "stdlib.h": "c",
     "argumentsparsing.h": "c",
     "stdbool.h": "c",
-    "argumentsvalidation.h": "c"
+    "argumentsvalidation.h": "c",
+    "stdio.h": "c",
+    "libwst.h": "c"
   }
 }

@@ -8,6 +8,8 @@ set(HEADERS
   src/cli/argumentsParsing.h
   src/cli/argumentsUtils.h
 
+  src/lib/libwst.h
+
   src/utils/errorPrinting.h
   src/utils/mathUtils.h
   src/utils/shortcutTypes.h
@@ -16,6 +18,8 @@ set(SOURCES
   src/cli/argumentsParsing.c
   src/cli/argumentsUtils.c
   src/cli/main.c
+
+  src/lib/libwst.c
 
   src/utils/errorPrinting.c
   src/utils/mathUtils.c
