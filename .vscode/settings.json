@@ -2,6 +2,10 @@
   "files.associations": {
     "argumentsparser.h": "c",
     "shortcuttypes.h": "c",
-    "errorprinting.h": "c"
+    "errorprinting.h": "c",
+    "stdlib.h": "c",
+    "argumentsparsing.h": "c",
+    "stdbool.h": "c",
+    "argumentsvalidation.h": "c"
   }
 }

@@ -4,18 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mathUtils.h"
 #include "shortcutTypes.h"
 
 typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', EMPTY } Option;
 
-typedef struct ArgumentContent {
-  char* content;
-  struct ArgumentContent* next;
-} ArgumentContent;
-
 typedef struct {
   Option option;
-  ArgumentContent* argumentContent;
+  char** contents;
+  uint quantityOfContents;
 } ParsedArguments;
 
 ParsedArguments* parseArguments(int argc, char** argv);

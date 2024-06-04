@@ -2,36 +2,37 @@
 
 const char OPTION_PREFIX = '-';
 
+ParsedArguments* generateInitializedParsedArguments(int argc);
 bool handleOption(char* currentArgv, Option* option);
-void handleContent(
-  char* currentArgv, ArgumentContent** currentContent, bool lastArgv
-);
 
 ParsedArguments* parseArguments(int argc, char** argv) {
-  ParsedArguments* parsedArguments = malloc(sizeof(ParsedArguments));
-  parsedArguments->argumentContent = malloc(sizeof(ArgumentContent));
-  parsedArguments->option = EMPTY;
+  ParsedArguments* parsedArguments = generateInitializedParsedArguments(argc);
 
-  ArgumentContent* currentContent = parsedArguments->argumentContent;
-  currentContent->content = NULL, currentContent->next = NULL;
-
+  char** currentContent = parsedArguments->contents;
   bool earlyReturn = false;
   for(int ind = 1; !earlyReturn && ind < argc; ind++) {
     char* currentArgv = argv[ind];
 
-    if(currentArgv[0] == OPTION_PREFIX) {
-      earlyReturn = handleOption(currentArgv, &parsedArguments->option);
-    } else {
-      bool lastArgv = ind == argc - 1;
-      handleContent(currentArgv, &currentContent, lastArgv);
-    }
+    if(currentArgv[0] != OPTION_PREFIX) *currentContent++ = currentArgv;
+    else earlyReturn = handleOption(currentArgv, &parsedArguments->option);
   }
 
   return parsedArguments;
 }
 
+inline ParsedArguments* generateInitializedParsedArguments(int argc) {
+  ParsedArguments* parsedArguments = malloc(sizeof(ParsedArguments));
+  const uint quantityOfContents = max(0, argc - 2);
+
+  parsedArguments->option = EMPTY;
+  parsedArguments->quantityOfContents = quantityOfContents;
+  parsedArguments->contents = malloc(quantityOfContents * sizeof(char*));
+
+  return parsedArguments;
+}
+
 inline bool handleOption(char* currentArgv, Option* option) {
-  bool doubleOptionPrefix = currentArgv[1] == OPTION_PREFIX;
+  const bool doubleOptionPrefix = currentArgv[1] == OPTION_PREFIX;
   *option = currentArgv[1 + doubleOptionPrefix];
 
   switch(*option) {
@@ -43,16 +44,4 @@ inline bool handleOption(char* currentArgv, Option* option) {
       return false;
     }
   }
-}
-
-inline void handleContent(
-  char* currentArgv, ArgumentContent** currentContent, bool lastArgv
-) {
-  ArgumentContent* current = *currentContent;
-  current->content = currentArgv;
-  if(lastArgv) return;
-
-  current->next = malloc(sizeof(ArgumentContent));
-  *currentContent = current = current->next;
-  current->content = NULL, current->next = NULL;
 }

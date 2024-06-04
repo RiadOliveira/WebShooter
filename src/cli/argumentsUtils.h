@@ -1,5 +1,5 @@
-#ifndef ARGUMENTS_VALIDATION_H
-#define ARGUMENTS_VALIDATION_H
+#ifndef ARGUMENTS_UTILS_H
+#define ARGUMENTS_UTILS_H
 
 #include "argumentsParsing.h"
 #include "errorPrinting.h"
@@ -7,6 +7,6 @@
 bool printErrorIfInvalidArguments(ParsedArguments* arguments);
 void printHelpMenu();
 
-void freeArguments(ParsedArguments* parsedArguments);
+void freeArguments(ParsedArguments* arguments);
 
 #endif

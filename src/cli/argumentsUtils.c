@@ -1,4 +1,4 @@
-#include "argumentsValidation.h"
+#include "argumentsUtils.h"
 
 const char* USAGE_INSTRUCTIONS_GENERAL = "Usage: wst [options] <arguments>\n";
 const char* USAGE_INSTRUCTIONS_WEB =
@@ -18,10 +18,8 @@ const char* HELP_MENU =
   "\t\tUsage: wst -u <file_to_unweb>\n\n"
   "  -h, --help\tShow this help message.\n";
 
-uint getQuantityOfContentsOnArguments(ParsedArguments* arguments);
-
 bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
-  uint quantityOfContents = getQuantityOfContentsOnArguments(arguments);
+  uint quantityOfContents = arguments->quantityOfContents;
 
   switch(arguments->option) {
     case EMPTY: {
@@ -60,28 +58,9 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
   }
 }
 
-uint getQuantityOfContentsOnArguments(ParsedArguments* arguments) {
-  ArgumentContent* current = arguments->argumentContent;
-  uint quantityOfContents = 0;
-
-  while(current != NULL && current->content != NULL) {
-    quantityOfContents++;
-    current = current->next;
-  }
-
-  return quantityOfContents;
-}
-
 inline void printHelpMenu() { printf("%s", HELP_MENU); }
 
-void freeArguments(ParsedArguments* parsedArguments) {
-  ArgumentContent* head = parsedArguments->argumentContent;
-
-  while(head != NULL) {
-    ArgumentContent* temporary = head->next;
-    free(head);
-    head = temporary;
-  }
-
-  free(parsedArguments);
+inline void freeArguments(ParsedArguments* arguments) {
+  free(arguments->contents);
+  free(arguments);
 }

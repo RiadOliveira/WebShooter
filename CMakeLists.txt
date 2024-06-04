@@ -6,17 +6,19 @@ set(MAIN_FILE "src/cli/main.c")
 
 set(HEADERS
   src/cli/argumentsParsing.h
-  src/cli/argumentsValidation.h
+  src/cli/argumentsUtils.h
 
   src/utils/errorPrinting.h
+  src/utils/mathUtils.h
   src/utils/shortcutTypes.h
 )
 set(SOURCES
   src/cli/argumentsParsing.c
-  src/cli/argumentsValidation.c
+  src/cli/argumentsUtils.c
   src/cli/main.c
 
   src/utils/errorPrinting.c
+  src/utils/mathUtils.c
 )
 
 list(REMOVE_ITEM SOURCES ${MAIN_FILE})
