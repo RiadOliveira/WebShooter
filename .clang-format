@@ -9,5 +9,7 @@
   AllowShortIfStatementsOnASingleLine: AllIfsAndElse,
   BreakConstructorInitializers: AfterColon,
   PackConstructorInitializers: BinPack,
-  SpaceBeforeCtorInitializerColon: false
+  SpaceBeforeCtorInitializerColon: false,
+  AllowShortCaseExpressionOnASingleLine: true,
+  AllowShortCaseLabelsOnASingleLine: true
 }

@@ -1,7 +1,14 @@
-#include "stdio.h"
+#include "argumentsParsing.h"
+#include "argumentsValidation.h"
 
-int main() {
-  printf("Hello World\n");
+int main(int argc, char** argv) {
+  ParsedArguments* arguments = parseArguments(argc, argv);
+  if(printErrorIfInvalidArguments(arguments)) return EXIT_FAILURE;
 
-  return 0;
+  if(arguments->option == HELP) printHelpMenu();
+  else {
+  }
+
+  freeArguments(arguments);
+  return EXIT_SUCCESS;
 }

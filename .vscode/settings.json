@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "argumentsparser.h": "c",
+    "shortcuttypes.h": "c",
+    "errorprinting.h": "c"
+  }
+}
