@@ -8,6 +8,9 @@
     "stdbool.h": "c",
     "argumentsvalidation.h": "c",
     "stdio.h": "c",
-    "libwst.h": "c"
+    "libwst.h": "c",
+    "argumentsutils.h": "c",
+    "unistd.h": "c",
+    "mathutils.h": "c"
   }
 }

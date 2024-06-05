@@ -4,8 +4,9 @@
 #include <shortcutTypes.h>
 
 void webContentsIntoArchive(
-  char* outputArchivePath, char** contents, uint contentsQuantity
+  const char* cwd, const char* outputArchivePath, const char** contentsPaths,
+  uint contentsQuantity
 );
-void unwebArchiveIntoContents(char* archivePath);
+void unwebArchiveIntoContents(const char* cwd, const char* archivePath);
 
 #endif

@@ -11,5 +11,6 @@
   PackConstructorInitializers: BinPack,
   SpaceBeforeCtorInitializerColon: false,
   AllowShortCaseExpressionOnASingleLine: true,
-  AllowShortCaseLabelsOnASingleLine: true
+  AllowShortCaseLabelsOnASingleLine: true,
+  IndentPPDirectives: BeforeHash
 }

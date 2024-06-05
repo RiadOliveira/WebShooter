@@ -69,3 +69,18 @@ inline void freeArguments(ParsedArguments* arguments) {
   free(arguments->contents);
   free(arguments);
 }
+
+inline char* getCwdOrPrintError() {
+  char* cwd = malloc(PATH_MAX * sizeof(char));
+
+  if(getcwd(cwd, PATH_MAX) == NULL) {
+    printErrorMessage(
+      "[Internal Error] Failed to get the current working directory\n"
+    );
+
+    free(cwd);
+    cwd = NULL;
+  }
+
+  return cwd;
+}
