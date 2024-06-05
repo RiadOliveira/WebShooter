@@ -11,6 +11,12 @@
     "libwst.h": "c",
     "argumentsutils.h": "c",
     "unistd.h": "c",
-    "mathutils.h": "c"
+    "mathutils.h": "c",
+    "argumentsfilling.h": "c",
+    "argumentstypes.h": "c",
+    "stdarg.h": "c",
+    "parsing.h": "c",
+    "types.h": "c",
+    "limits.h": "c"
   }
 }

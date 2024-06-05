@@ -1,8 +1,7 @@
 #include "libwst.h"
 
 void webContentsIntoArchive(
-  const char* cwd, const char* outputArchivePath, const char** contentsPaths,
-  uint contentsQuantity
+  WstOperationParams* params, const char* outputArchivePath
 ) {}
 
-void unwebArchiveIntoContents(const char* cwd, const char* archivePath) {}
+void unwebArchiveIntoContents(WstOperationParams* params) {}

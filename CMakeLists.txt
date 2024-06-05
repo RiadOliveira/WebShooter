@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.22)
 project(WebShooter LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
-set(MAIN_FILE "src/cli/main.c")
+set(MAIN_FILE "src/cli/cliwst.c")
 
 set(HEADERS
-  src/cli/argumentsParsing.h
-  src/cli/argumentsUtils.h
+  src/cli/cliTypes.h
+  src/cli/parsing.h
+  src/cli/validation.h
 
+  src/lib/libTypes.h
   src/lib/libwst.h
 
   src/utils/errorPrinting.h
@@ -15,9 +17,9 @@ set(HEADERS
   src/utils/shortcutTypes.h
 )
 set(SOURCES
-  src/cli/argumentsParsing.c
-  src/cli/argumentsUtils.c
-  src/cli/main.c
+  src/cli/cliwst.c
+  src/cli/parsing.c
+  src/cli/validation.c
 
   src/lib/libwst.c
 

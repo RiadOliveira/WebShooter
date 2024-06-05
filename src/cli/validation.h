@@ -1,9 +1,9 @@
-#ifndef ARGUMENTS_UTILS_H
-#define ARGUMENTS_UTILS_H
+#ifndef VALIDATION_H
+#define VALIDATION_H
 
 #include <limits.h>
 
-#include "argumentsParsing.h"
+#include "cliTypes.h"
 #include "errorPrinting.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -18,10 +18,7 @@
   #define getCWDBasedOnSO getcwd
 #endif
 
-bool printErrorIfInvalidArguments(ParsedArguments* arguments);
+bool validateArguments(ParsedArguments* arguments);
 void printHelpMenu();
-
-char* getCwdOrPrintError();
-void freeArguments(ParsedArguments* arguments);
 
 #endif

@@ -1,10 +1,8 @@
-#ifndef ARGUMENTS_PARSING_H
-#define ARGUMENTS_PARSING_H
+#ifndef CLI_TYPES_H
+#define CLI_TYPES_H
 
-#include <stdio.h>
 #include <stdlib.h>
 
-#include "mathUtils.h"
 #include "shortcutTypes.h"
 
 typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', EMPTY } Option;
@@ -12,9 +10,7 @@ typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', EMPTY } Option;
 typedef struct {
   Option option;
   char** contents;
-  uint quantityOfContents;
+  size_t contentsSize;
 } ParsedArguments;
-
-ParsedArguments* parseArguments(int argc, char** argv);
 
 #endif

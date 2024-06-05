@@ -1,4 +1,4 @@
-#include "argumentsUtils.h"
+#include "validation.h"
 
 const char* USAGE_INSTRUCTIONS_GENERAL = "Usage: wst [options] <arguments>\n";
 const char* USAGE_INSTRUCTIONS_WEB =
@@ -18,8 +18,8 @@ const char* HELP_MENU =
   "\t\t%s\n"
   "  -h, --help\tShow this help message.\n";
 
-bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
-  uint quantityOfContents = arguments->quantityOfContents;
+bool validateArguments(ParsedArguments* arguments) {
+  const size_t contentsSize = arguments->contentsSize;
 
   switch(arguments->option) {
     case EMPTY: {
@@ -28,10 +28,10 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
         "'-h' or '--help'.\n%s",
         USAGE_INSTRUCTIONS_GENERAL
       );
-      return true;
+      return false;
     }
     case WEB: {
-      bool hasOutputFileAndAtLeastOneContent = quantityOfContents >= 2;
+      const bool hasOutputFileAndAtLeastOneContent = contentsSize >= 2;
       if(!hasOutputFileAndAtLeastOneContent) {
         printErrorMessage(
           "Insufficient arguments passed to perform Web operation! At least "
@@ -40,10 +40,10 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
         );
       }
 
-      return !hasOutputFileAndAtLeastOneContent;
+      return hasOutputFileAndAtLeastOneContent;
     }
     case UNWEB: {
-      bool hasFileToUnweb = quantityOfContents >= 1;
+      const bool hasFileToUnweb = contentsSize >= 1;
       if(!hasFileToUnweb) {
         printErrorMessage(
           "Insufficient arguments passed to perform Unweb operation! At least "
@@ -52,9 +52,9 @@ bool printErrorIfInvalidArguments(ParsedArguments* arguments) {
         );
       }
 
-      return !hasFileToUnweb;
+      return hasFileToUnweb;
     }
-    default: return false;
+    default: return true;
   }
 }
 
@@ -63,24 +63,4 @@ inline void printHelpMenu() {
     HELP_MENU, USAGE_INSTRUCTIONS_GENERAL, USAGE_INSTRUCTIONS_WEB,
     USAGE_INSTRUCTIONS_UNWEB
   );
-}
-
-inline void freeArguments(ParsedArguments* arguments) {
-  free(arguments->contents);
-  free(arguments);
-}
-
-inline char* getCwdOrPrintError() {
-  char* cwd = malloc(PATH_MAX * sizeof(char));
-
-  if(getcwd(cwd, PATH_MAX) == NULL) {
-    printErrorMessage(
-      "[Internal Error] Failed to get the current working directory\n"
-    );
-
-    free(cwd);
-    cwd = NULL;
-  }
-
-  return cwd;
 }
