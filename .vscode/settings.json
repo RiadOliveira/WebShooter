@@ -17,6 +17,18 @@
     "stdarg.h": "c",
     "parsing.h": "c",
     "types.h": "c",
-    "limits.h": "c"
+    "limits.h": "c",
+    "parser.h": "c",
+    "validation.h": "c",
+    "clitypes.h": "c",
+    "validator.h": "c",
+    "cwdgetter.h": "c",
+    "stat.h": "c",
+    "errorthrower.h": "c",
+    "pathhandler.h": "c",
+    "typeverification.h": "c",
+    "typeverificator.h": "c",
+    "libtypes.h": "c",
+    "typechecker.h": "c"
   }
 }

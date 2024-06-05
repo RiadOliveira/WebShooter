@@ -6,24 +6,30 @@ set(MAIN_FILE "src/cli/cliwst.c")
 
 set(HEADERS
   src/cli/cliTypes.h
-  src/cli/parsing.h
-  src/cli/validation.h
+  src/cli/cwdGetter.h
+  src/cli/parser.h
+  src/cli/validator.h
 
   src/lib/libTypes.h
   src/lib/libwst.h
+  src/lib/pathHandler.h
+  src/lib/typeChecker.h
 
-  src/utils/errorPrinting.h
+  src/utils/errorThrower.h
   src/utils/mathUtils.h
   src/utils/shortcutTypes.h
 )
 set(SOURCES
   src/cli/cliwst.c
-  src/cli/parsing.c
-  src/cli/validation.c
+  src/cli/cwdGetter.c
+  src/cli/parser.c
+  src/cli/validator.c
 
   src/lib/libwst.c
+  src/lib/pathHandler.c
+  src/lib/typeChecker.c
 
-  src/utils/errorPrinting.c
+  src/utils/errorThrower.c
   src/utils/mathUtils.c
 )
 

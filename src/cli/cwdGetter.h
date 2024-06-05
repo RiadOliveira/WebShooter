@@ -1,10 +1,10 @@
-#ifndef VALIDATION_H
-#define VALIDATION_H
+#ifndef CWD_GETTER_H
+#define CWD_GETTER_H
 
 #include <limits.h>
+#include <stdbool.h>
 
-#include "cliTypes.h"
-#include "errorPrinting.h"
+#include "errorThrower.h"
 
 #if defined(_WIN32) || defined(_WIN64)
   #include <direct.h>
@@ -18,7 +18,6 @@
   #define getCWDBasedOnSO getcwd
 #endif
 
-bool validateArguments(ParsedArguments* arguments);
-void printHelpMenu();
+void getCwdOrExit(char* cwd, size_t size);
 
 #endif

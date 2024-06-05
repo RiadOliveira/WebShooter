@@ -1,10 +1,10 @@
-#include "validation.h"
+#include "validator.h"
 
 const char* USAGE_INSTRUCTIONS_GENERAL = "Usage: wst [options] <arguments>\n";
 const char* USAGE_INSTRUCTIONS_WEB =
-  "Usage: wst -w <output_archive> <content1> <content2> ...\n";
+  "Usage: wst -w <output_archive_path> <content_path1> <content_path2> ...\n";
 const char* USAGE_INSTRUCTIONS_UNWEB =
-  "Usage: wst -u <archive_to_unweb1> <archive_to_unweb2> ...\n";
+  "Usage: wst -u <archive_to_unweb_path1> <archive_to_unweb_path2> ...\n";
 const char* HELP_MENU =
   "%sDescription: WebShooter is a tool to web files and folders into or "
   "unweb from a single archive.\n\n"
@@ -18,43 +18,35 @@ const char* HELP_MENU =
   "\t\t%s\n"
   "  -h, --help\tShow this help message.\n";
 
-bool validateArguments(ParsedArguments* arguments) {
+void validateArguments(ParsedArguments* arguments) {
   const size_t contentsSize = arguments->contentsSize;
 
   switch(arguments->option) {
     case EMPTY: {
-      printErrorMessage(
+      printErrorAndExit(
         "Invalid or no option received. For detailed usage instructions, try "
         "'-h' or '--help'.\n%s",
         USAGE_INSTRUCTIONS_GENERAL
       );
-      return false;
     }
     case WEB: {
-      const bool hasOutputFileAndAtLeastOneContent = contentsSize >= 2;
-      if(!hasOutputFileAndAtLeastOneContent) {
-        printErrorMessage(
-          "Insufficient arguments passed to perform Web operation! At least "
-          "two arguments are required: <output_archive> <content>\n\n%s",
-          USAGE_INSTRUCTIONS_WEB
-        );
-      }
-
-      return hasOutputFileAndAtLeastOneContent;
+      if(contentsSize >= 2) break;
+      printErrorAndExit(
+        "Insufficient arguments passed to perform Web operation! At least "
+        "two arguments are required: <output_archive_path> "
+        "<content_path>\n\n%s",
+        USAGE_INSTRUCTIONS_WEB
+      );
     }
     case UNWEB: {
-      const bool hasFileToUnweb = contentsSize >= 1;
-      if(!hasFileToUnweb) {
-        printErrorMessage(
-          "Insufficient arguments passed to perform Unweb operation! At least "
-          "one argument is required: <archive_to_unweb>\n\n%s",
-          USAGE_INSTRUCTIONS_UNWEB
-        );
-      }
-
-      return hasFileToUnweb;
+      if(contentsSize >= 1) break;
+      printErrorAndExit(
+        "Insufficient arguments passed to perform Unweb operation! At least "
+        "one argument is required: <archive_to_unweb_path>\n\n%s",
+        USAGE_INSTRUCTIONS_UNWEB
+      );
     }
-    default: return true;
+    default: break;
   }
 }
 

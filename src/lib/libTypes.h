@@ -5,10 +5,12 @@
 
 #include "shortcutTypes.h"
 
+typedef enum { C_FILE, C_FOLDER } ContentType;
+
 typedef struct {
   const char* cwd;
-  const char** archiveOrContentPaths;
-  size_t archivesOrContentsSize;
-} WstOperationParams;
+  const char** contentOrArchivePaths;
+  size_t contentsOrArchivesSize;
+} WstParams;
 
 #endif

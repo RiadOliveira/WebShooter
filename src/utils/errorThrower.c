@@ -1,9 +1,11 @@
-#include "errorPrinting.h"
+#include "errorThrower.h"
 
-inline void printErrorMessage(const char* format, ...) {
+inline void printErrorAndExit(const char* format, ...) {
   va_list messages;
 
   va_start(messages, format);
   vfprintf(stderr, format, messages);
   va_end(messages);
+
+  exit(EXIT_FAILURE);
 }

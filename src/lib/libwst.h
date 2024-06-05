@@ -2,11 +2,10 @@
 #define LIB_WEB_SHOOTER_H
 
 #include "libTypes.h"
+#include "typeChecker.h"
 
-void webContentsIntoArchive(
-  WstOperationParams* params, const char* outputArchivePath
-);
+void webContentsIntoArchive(WstParams* params, const char* archivePath);
 
-void unwebArchiveIntoContents(WstOperationParams* params);
+void unwebArchiveIntoContents(WstParams* params);
 
 #endif
