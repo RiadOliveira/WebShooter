@@ -10,10 +10,11 @@ set(HEADERS
   src/cli/parser.h
   src/cli/validator.h
 
+  src/lib/constants.h
+  src/lib/dataGetter.h
   src/lib/libTypes.h
   src/lib/libwst.h
   src/lib/pathHandler.h
-  src/lib/typeChecker.h
 
   src/utils/errorThrower.h
   src/utils/mathUtils.h
@@ -25,9 +26,10 @@ set(SOURCES
   src/cli/parser.c
   src/cli/validator.c
 
-  src/lib/libwst.c
+  src/lib/archiveUnwebber.c
+  src/lib/contentsWebber.c
+  src/lib/dataGetter.c
   src/lib/pathHandler.c
-  src/lib/typeChecker.c
 
   src/utils/errorThrower.c
   src/utils/mathUtils.c

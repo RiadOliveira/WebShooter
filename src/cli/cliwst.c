@@ -30,5 +30,5 @@ inline void fillParams(WstParams* params, ParsedArguments* arguments) {
   const bool webOption = arguments->option == WEB;
 
   params->contentOrArchivePaths = (const char**)&arguments->contents[webOption];
-  params->contentsOrArchivesSize = arguments->contentsSize - webOption;
+  params->contentsOrArchivesQuantity = arguments->contentsQuantity - webOption;
 }

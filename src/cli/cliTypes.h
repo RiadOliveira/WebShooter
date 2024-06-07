@@ -10,7 +10,7 @@ typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', EMPTY } Option;
 typedef struct {
   Option option;
   char** contents;
-  size_t contentsSize;
+  size_t contentsQuantity;
 } ParsedArguments;
 
 #endif

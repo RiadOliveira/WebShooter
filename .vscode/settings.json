@@ -29,6 +29,11 @@
     "typeverification.h": "c",
     "typeverificator.h": "c",
     "libtypes.h": "c",
-    "typechecker.h": "c"
+    "typechecker.h": "c",
+    "webcontents.h": "c",
+    "archiveunwebber.h": "c",
+    "contentswebber.h": "c",
+    "datagetter.h": "c",
+    "dirent.h": "c"
   }
 }

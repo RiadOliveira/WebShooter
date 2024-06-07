@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 
+#include "constants.h"
 #include "shortcutTypes.h"
 
 typedef enum { C_FILE, C_FOLDER } ContentType;
@@ -10,7 +11,14 @@ typedef enum { C_FILE, C_FOLDER } ContentType;
 typedef struct {
   const char* cwd;
   const char** contentOrArchivePaths;
-  size_t contentsOrArchivesSize;
+  size_t contentsOrArchivesQuantity;
 } WstParams;
+
+typedef struct ContentData {
+  char name[CONTENT_NAME_MAX_SIZE];
+  ullong size;
+  struct ContentData* subContents;
+  size_t subContentsQuantity;
+} ContentData;
 
 #endif

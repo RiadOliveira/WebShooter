@@ -1,16 +1,14 @@
 #include "pathHandler.h"
 
-const char* PATH_SEPARATOR = "/";
-const int SEPARATOR_AND_TERMINATOR_TOTAL_SIZE = 2;
+inline void appendPath(
+  char* destination, unsigned int position, const char* source
+) {
+  bool destinationHasSeparator = destination[position - 1] == PATH_SEPARATOR;
+  unsigned int parsedPosition = position;
 
-const char* joinPaths(const char* first, const char* second) {
-  char* result = malloc(
-    strlen(first) + strlen(second) + SEPARATOR_AND_TERMINATOR_TOTAL_SIZE
-  );
+  if(!destinationHasSeparator) destination[parsedPosition++] = PATH_SEPARATOR;
+  destination[parsedPosition] = NULL_TERMINATOR;
 
-  strcpy(result, first);
-  strcat(result, PATH_SEPARATOR);
-  strcat(result, second);
-
-  return result;
+  bool sourceHasSeparator = source[0] == PATH_SEPARATOR;
+  strcat(&destination[parsedPosition], &source[sourceHasSeparator]);
 }

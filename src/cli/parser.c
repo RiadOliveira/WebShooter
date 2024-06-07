@@ -19,11 +19,11 @@ void parseArguments(ParsedArguments* arguments, int argc, char** argv) {
 }
 
 inline void initializeArguments(ParsedArguments* arguments, int argc) {
-  const size_t contentsSize = max(0, argc - 2);
+  const size_t contentsQuantity = max(0, argc - 2);
 
   arguments->option = EMPTY;
-  arguments->contentsSize = contentsSize;
-  arguments->contents = malloc(contentsSize * sizeof(char*));
+  arguments->contentsQuantity = contentsQuantity;
+  arguments->contents = malloc(contentsQuantity * sizeof(char*));
 }
 
 inline bool handleOption(char* currentArgv, Option* option) {

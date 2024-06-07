@@ -19,7 +19,7 @@ const char* HELP_MENU =
   "  -h, --help\tShow this help message.\n";
 
 void validateArguments(ParsedArguments* arguments) {
-  const size_t contentsSize = arguments->contentsSize;
+  const size_t contentsQuantity = arguments->contentsQuantity;
 
   switch(arguments->option) {
     case EMPTY: {
@@ -30,7 +30,7 @@ void validateArguments(ParsedArguments* arguments) {
       );
     }
     case WEB: {
-      if(contentsSize >= 2) break;
+      if(contentsQuantity >= 2) break;
       printErrorAndExit(
         "Insufficient arguments passed to perform Web operation! At least "
         "two arguments are required: <output_archive_path> "
@@ -39,7 +39,7 @@ void validateArguments(ParsedArguments* arguments) {
       );
     }
     case UNWEB: {
-      if(contentsSize >= 1) break;
+      if(contentsQuantity >= 1) break;
       printErrorAndExit(
         "Insufficient arguments passed to perform Unweb operation! At least "
         "one argument is required: <archive_to_unweb_path>\n\n%s",
