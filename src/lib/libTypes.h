@@ -6,8 +6,6 @@
 #include "constants.h"
 #include "shortcutTypes.h"
 
-typedef enum { C_FILE, C_FOLDER } ContentType;
-
 typedef struct {
   const char* cwd;
   const char** contentOrArchivePaths;

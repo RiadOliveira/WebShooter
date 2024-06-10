@@ -17,6 +17,7 @@ set(HEADERS
   src/lib/pathHandler.h
 
   src/utils/errorThrower.h
+  src/utils/fileHandler.h
   src/utils/mathUtils.h
   src/utils/shortcutTypes.h
 )
@@ -32,6 +33,7 @@ set(SOURCES
   src/lib/pathHandler.c
 
   src/utils/errorThrower.c
+  src/utils/fileHandler.c
   src/utils/mathUtils.c
 )
 

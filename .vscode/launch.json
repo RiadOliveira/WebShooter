@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/debug/wst",
-      "args": ["-w", "output", "LICENSE", "./tmp/exampleFile.tar", "debug"],
+      "args": ["-w", "output", "tmp/exampleFile.iso"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

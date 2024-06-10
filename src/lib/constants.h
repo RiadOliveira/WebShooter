@@ -3,6 +3,9 @@
 
 #define PATH_MAX_SIZE 4096
 #define CONTENT_NAME_MAX_SIZE 255
+
+#define BUFFER_SIZE 1024000
+
 #define PATH_SEPARATOR '/'
 #define NULL_TERMINATOR '\0'
 
