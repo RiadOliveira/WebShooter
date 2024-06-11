@@ -23,6 +23,8 @@ typedef struct {
   byte data[BUFFER_MAX_SIZE];
   size_t size;
   BufferStatus status;
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
 } Buffer;
 
 #endif

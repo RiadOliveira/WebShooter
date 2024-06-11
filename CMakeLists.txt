@@ -13,7 +13,7 @@ set(HEADERS
   src/lib/archiveUnwebber.h
   src/lib/constants.h
   src/lib/contentsWebber.h
-  src/lib/dataGetter.h
+  src/lib/dataHandler.h
   src/lib/libTypes.h
   src/lib/libwst.h
   src/lib/pathHandler.h
@@ -31,7 +31,7 @@ set(SOURCES
 
   src/lib/archiveUnwebber.c
   src/lib/contentsWebber.c
-  src/lib/dataGetter.c
+  src/lib/dataHandler.c
   src/lib/pathHandler.c
 
   src/utils/errorThrower.c

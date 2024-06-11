@@ -11,9 +11,7 @@ void* handleArchiveWriting(void*);
 
 void webContentsIntoArchive(WstParams* params, const char* archivePath) {
   Buffer buffers[BUFFERS_QUANTITY];
-  for(size_t ind = 0; ind < BUFFERS_QUANTITY; ind++) {
-    buffers[ind].size = buffers[ind].status = UNINITIALIZED;
-  }
+  initializeBuffers(buffers, BUFFERS_QUANTITY);
 
   pthread_t readThread;
   ReadThreadParams readParams = {
@@ -25,8 +23,8 @@ void webContentsIntoArchive(WstParams* params, const char* archivePath) {
   WriteThreadParams writingParams = {archivePath, buffers};
   pthread_create(&writingThread, NULL, handleArchiveWriting, &writingParams);
 
-  pthread_join(readThread, NULL);
   pthread_join(writingThread, NULL);
+  finalizeBuffers(buffers, BUFFERS_QUANTITY);
 }
 
 inline void* handleContentsReading(void* params) {
@@ -36,7 +34,7 @@ inline void* handleContentsReading(void* params) {
   ContentData currentData;
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     const char* path = parsedParams->contentPaths[ind];
-    getContentData(&currentData, path);
+    fillContentData(&currentData, path);
 
     bool isFolder = currentData.size == 0;
     bool lastContent = ind == parsedParams->contentsQuantity - 1;
@@ -105,12 +103,18 @@ void parseBufferForWebbing(
 
 inline void advanceBufferAndWait(Buffer* buffers, uint* bufferInd) {
   Buffer* selectedBuffer = &buffers[*bufferInd];
-
   selectedBuffer->status = READABLE;
-  if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
+  pthread_cond_signal(&selectedBuffer->cond);
 
+  if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
   selectedBuffer = &buffers[*bufferInd];
-  while(selectedBuffer->status != UNINITIALIZED);
+  pthread_mutex_t* mutex = &selectedBuffer->mutex;
+
+  pthread_mutex_lock(mutex);
+  while(selectedBuffer->status != UNINITIALIZED) {
+    pthread_cond_wait(&selectedBuffer->cond, mutex);
+  }
+  pthread_mutex_unlock(mutex);
 }
 
 void* handleArchiveWriting(void* params) {
@@ -119,15 +123,22 @@ void* handleArchiveWriting(void* params) {
 
   uint bufferInd = 0;
   Buffer* selectedBuffer = &parsedParams->buffers[bufferInd];
+  pthread_mutex_t* mutex = &selectedBuffer->mutex;
 
   do {
-    while(selectedBuffer->status != READABLE);
+    pthread_mutex_lock(mutex);
+    while(selectedBuffer->status != READABLE) {
+      pthread_cond_wait(&selectedBuffer->cond, mutex);
+    }
+    pthread_mutex_unlock(mutex);
 
     fwrite(selectedBuffer->data, 1, selectedBuffer->size, archive);
     selectedBuffer->size = selectedBuffer->status = UNINITIALIZED;
+    pthread_cond_signal(&selectedBuffer->cond);
 
     if(++bufferInd == BUFFERS_QUANTITY) bufferInd = 0;
     selectedBuffer = &parsedParams->buffers[bufferInd];
+    mutex = &selectedBuffer->mutex;
   } while(selectedBuffer->status != EMPTY);
 
   fclose(archive);

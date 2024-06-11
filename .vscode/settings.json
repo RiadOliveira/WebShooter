@@ -33,7 +33,6 @@
     "webcontents.h": "c",
     "archiveunwebber.h": "c",
     "contentswebber.h": "c",
-    "datagetter.h": "c",
     "dirent.h": "c",
     "filehandler.h": "c",
     "constants.h": "c",
@@ -41,6 +40,7 @@
     "string": "c",
     "string_view": "c",
     "initializer_list": "c",
-    "utility": "c"
+    "utility": "c",
+    "datahandler.h": "c"
   }
 }
