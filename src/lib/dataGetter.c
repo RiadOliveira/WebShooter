@@ -14,18 +14,16 @@ inline void getContentName(char* contentName, const char* path) {
   } while(path[ind++] != '\0');
 }
 
-inline ullong getContentSize(const char* contentPath) {
+inline size_t getContentSize(const char* path) {
   struct stat pathStat;
-  if(stat(contentPath, &pathStat) != 0) {
-    printErrorAndExit(LOCATING_ERROR_MESSAGE, contentPath);
+  if(stat(path, &pathStat) != 0) {
+    printErrorAndExit(LOCATING_ERROR_MESSAGE, path);
   }
 
   const uint stMode = pathStat.st_mode;
   const bool isFile = S_ISREG(stMode);
   const bool isFolder = S_ISDIR(stMode);
-  if(!isFile && !isFolder) {
-    printErrorAndExit(LOCATING_ERROR_MESSAGE, contentPath);
-  }
+  if(!isFile && !isFolder) printErrorAndExit(LOCATING_ERROR_MESSAGE, path);
 
   return isFile ? pathStat.st_size : 0;
 }

@@ -10,7 +10,9 @@ set(HEADERS
   src/cli/parser.h
   src/cli/validator.h
 
+  src/lib/archiveUnwebber.h
   src/lib/constants.h
+  src/lib/contentsWebber.h
   src/lib/dataGetter.h
   src/lib/libTypes.h
   src/lib/libwst.h

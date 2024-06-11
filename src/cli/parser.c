@@ -21,7 +21,7 @@ void parseArguments(ParsedArguments* arguments, int argc, char** argv) {
 inline void initializeArguments(ParsedArguments* arguments, int argc) {
   const size_t contentsQuantity = max(0, argc - 2);
 
-  arguments->option = EMPTY;
+  arguments->option = UNSET;
   arguments->contentsQuantity = contentsQuantity;
   arguments->contents = malloc(contentsQuantity * sizeof(char*));
 }
@@ -35,7 +35,7 @@ inline bool handleOption(char* currentArgv, Option* option) {
     case UNWEB: return false;
     case HELP: return true;
     default: {
-      *option = EMPTY;
+      *option = UNSET;
       return false;
     }
   }

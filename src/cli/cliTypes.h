@@ -5,7 +5,7 @@
 
 #include "shortcutTypes.h"
 
-typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', EMPTY } Option;
+typedef enum { WEB = 'w', UNWEB = 'u', HELP = 'h', UNSET } Option;
 
 typedef struct {
   Option option;

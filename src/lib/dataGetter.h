@@ -13,6 +13,6 @@
 #endif
 
 void getContentName(char* contentName, const char* path);
-ullong getContentSize(const char* contentPath);
+size_t getContentSize(const char* contentPath);
 
 #endif

@@ -6,6 +6,8 @@
 #include "constants.h"
 #include "shortcutTypes.h"
 
+typedef enum { UNINITIALIZED, READABLE, EMPTY } BufferStatus;
+
 typedef struct {
   const char* cwd;
   const char** contentOrArchivePaths;
@@ -14,9 +16,13 @@ typedef struct {
 
 typedef struct ContentData {
   char name[CONTENT_NAME_MAX_SIZE];
-  ullong size;
-  struct ContentData* subContents;
-  size_t subContentsQuantity;
+  size_t size;
 } ContentData;
+
+typedef struct {
+  byte data[BUFFER_MAX_SIZE];
+  size_t size;
+  BufferStatus status;
+} Buffer;
 
 #endif

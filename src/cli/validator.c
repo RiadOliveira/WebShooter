@@ -22,7 +22,7 @@ void validateArguments(ParsedArguments* arguments) {
   const size_t contentsQuantity = arguments->contentsQuantity;
 
   switch(arguments->option) {
-    case EMPTY: {
+    case UNSET: {
       printErrorAndExit(
         "Invalid or no option received. For detailed usage instructions, try "
         "'-h' or '--help'.\n%s",
