@@ -12,7 +12,6 @@
   #define stat _stat
 #endif
 
-void getContentName(char* contentName, const char* path);
-size_t getContentSize(const char* contentPath);
+void getContentData(ContentData* data, const char* path);
 
 #endif

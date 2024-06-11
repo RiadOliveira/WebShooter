@@ -8,14 +8,13 @@
 #include "libwst.h"
 
 typedef struct {
-  WstParams* wstParams;
+  const char** contentPaths;
+  const size_t contentsQuantity;
   Buffer* buffers;
-  char* currentFullPath;
-  const size_t cwdLength;
 } ReadThreadParams;
 
 typedef struct {
-  FILE* archive;
+  const char* archivePath;
   Buffer* buffers;
 } WriteThreadParams;
 

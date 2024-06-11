@@ -1,8 +1,8 @@
 #include "contentsWebber.h"
 
 void* handleContentsReading(void*);
-void webFolderIntoBuffer();
-void webFileIntoBuffer(ContentData*, Buffer*, const char*);
+void webFolderIntoBuffer(ContentData*, Buffer*, const char*, bool);
+void webFileIntoBuffer(ContentData*, Buffer*, const char*, bool);
 
 void parseBufferForWebbing(ContentData*, Buffer*, uint*);
 void advanceBufferAndWait(Buffer*, uint*);
@@ -10,73 +10,75 @@ void advanceBufferAndWait(Buffer*, uint*);
 void* handleArchiveWriting(void*);
 
 void webContentsIntoArchive(WstParams* params, const char* archivePath) {
-  char currentFullPath[PATH_MAX_SIZE];
-  strcpy(currentFullPath, params->cwd);
-
-  const size_t cwdLength = strlen(params->cwd);
-  appendPath(currentFullPath, cwdLength, archivePath);
-  FILE* archive = openFileOrExit(currentFullPath, "wb");
-
   Buffer buffers[BUFFERS_QUANTITY];
-  pthread_t readThread, writingThread;
-
-  ReadThreadParams readParams = {params, buffers, currentFullPath, cwdLength};
-  pthread_create(&readThread, NULL, handleContentsReading, &readParams);
-
-  WriteThreadParams writingParams = {archive, buffers};
-  pthread_create(&writingThread, NULL, handleArchiveWriting, &writingParams);
-
-  pthread_join(readThread, NULL);
-  pthread_join(writingThread, NULL);
-
-  fclose(archive);
-}
-
-void* handleContentsReading(void* params) {
-  ReadThreadParams* parsedParams = (ReadThreadParams*)params;
-
-  Buffer* buffers = parsedParams->buffers;
   for(size_t ind = 0; ind < BUFFERS_QUANTITY; ind++) {
     buffers[ind].size = buffers[ind].status = UNINITIALIZED;
   }
 
+  pthread_t readThread;
+  ReadThreadParams readParams = {
+    params->contentOrArchivePaths, params->contentsOrArchivesQuantity, buffers
+  };
+  pthread_create(&readThread, NULL, handleContentsReading, &readParams);
+
+  pthread_t writingThread;
+  WriteThreadParams writingParams = {archivePath, buffers};
+  pthread_create(&writingThread, NULL, handleArchiveWriting, &writingParams);
+
+  pthread_join(readThread, NULL);
+  pthread_join(writingThread, NULL);
+}
+
+inline void* handleContentsReading(void* params) {
+  ReadThreadParams* parsedParams = (ReadThreadParams*)params;
+  Buffer* buffers = parsedParams->buffers;
+
   ContentData currentData;
-  char* currentFullPath = parsedParams->currentFullPath;
-  const WstParams* wstParams = parsedParams->wstParams;
+  for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
+    const char* path = parsedParams->contentPaths[ind];
+    getContentData(&currentData, path);
 
-  for(size_t ind = 0; ind < wstParams->contentsOrArchivesQuantity; ind++) {
-    const char* currentPath = wstParams->contentOrArchivePaths[ind];
+    bool isFolder = currentData.size == 0;
+    bool lastContent = ind == parsedParams->contentsQuantity - 1;
 
-    getContentName(currentData.name, currentPath);
-    appendPath(currentFullPath, parsedParams->cwdLength, currentPath);
-    currentData.size = getContentSize(currentFullPath);
-
-    webFileIntoBuffer(&currentData, buffers, currentFullPath);
+    if(isFolder) webFolderIntoBuffer(&currentData, buffers, path, lastContent);
+    else webFileIntoBuffer(&currentData, buffers, path, lastContent);
   }
 }
 
-void webFolderIntoBuffer();
+void webFolderIntoBuffer(
+  ContentData* data, Buffer* buffers, const char* path, bool lastContent
+) {}
 
-void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
+void webFileIntoBuffer(
+  ContentData* data, Buffer* buffers, const char* path, bool lastContent
+) {
   uint bufferInd = 0;
   while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
   parseBufferForWebbing(data, buffers, &bufferInd);
 
-  Buffer selectedBuffer = buffers[bufferInd];
-  size_t currentSize = selectedBuffer.size;
-  byte* currentData = &selectedBuffer.data[currentSize];
-
   FILE* content = openFileOrExit(path, "rb");
-  size_t bytesRead, expectedToRead;
-  do {
-    expectedToRead = BUFFER_MAX_SIZE - currentSize;
-    bytesRead = fread(currentData, 1, expectedToRead, content);
+  Buffer* currentBuffer = &buffers[bufferInd];
 
-    if(expectedToRead == bytesRead) {
+  size_t bytesRead;
+  do {
+    const size_t currentSize = currentBuffer->size;
+    const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
+
+    byte* currentData = &currentBuffer->data[currentSize];
+    bytesRead = fread(currentData, 1, maxSizeReadable, content);
+    currentBuffer->size += bytesRead;
+
+    if(maxSizeReadable == bytesRead) {
       advanceBufferAndWait(buffers, &bufferInd);
-      currentData = buffers[bufferInd].data;
+      currentBuffer = &buffers[bufferInd];
     }
   } while(bytesRead > 0);
+
+  if(lastContent) {
+    advanceBufferAndWait(buffers, &bufferInd);
+    buffers[bufferInd].status = EMPTY;
+  }
 
   fclose(content);
 }
@@ -88,12 +90,12 @@ void parseBufferForWebbing(
   const size_t sizeOfSizeT = sizeof(size_t);
   const size_t sizeToAdd = nameSize + sizeOfSizeT;
 
-  Buffer currentBuffer = buffers[*bufferInd];
-  bool exceedsMaxSize = currentBuffer.size + sizeToAdd > BUFFER_MAX_SIZE;
+  Buffer* currentBuffer = &buffers[*bufferInd];
+  bool exceedsMaxSize = currentBuffer->size + sizeToAdd > BUFFER_MAX_SIZE;
   if(exceedsMaxSize) advanceBufferAndWait(buffers, bufferInd);
 
-  byte* bufferData = currentBuffer.data;
-  currentBuffer.size += sizeToAdd;
+  byte* bufferData = currentBuffer->data;
+  currentBuffer->size += sizeToAdd;
 
   memcpy(bufferData, data->name, nameSize);
   bufferData += nameSize;
@@ -102,12 +104,31 @@ void parseBufferForWebbing(
 }
 
 inline void advanceBufferAndWait(Buffer* buffers, uint* bufferInd) {
-  buffers[*bufferInd].status = READABLE;
+  Buffer* selectedBuffer = &buffers[*bufferInd];
+
+  selectedBuffer->status = READABLE;
   if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
 
-  while(buffers[*bufferInd].status != UNINITIALIZED);
+  selectedBuffer = &buffers[*bufferInd];
+  while(selectedBuffer->status != UNINITIALIZED);
 }
 
 void* handleArchiveWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
+  FILE* archive = openFileOrExit(parsedParams->archivePath, "wb");
+
+  uint bufferInd = 0;
+  Buffer* selectedBuffer = &parsedParams->buffers[bufferInd];
+
+  do {
+    while(selectedBuffer->status != READABLE);
+
+    fwrite(selectedBuffer->data, 1, selectedBuffer->size, archive);
+    selectedBuffer->size = selectedBuffer->status = UNINITIALIZED;
+
+    if(++bufferInd == BUFFERS_QUANTITY) bufferInd = 0;
+    selectedBuffer = &parsedParams->buffers[bufferInd];
+  } while(selectedBuffer->status != EMPTY);
+
+  fclose(archive);
 }
