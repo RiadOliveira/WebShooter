@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include "constants.h"
 #include "errorThrower.h"
 
 FILE* openFileOrExit(const char* path, const char* modes);

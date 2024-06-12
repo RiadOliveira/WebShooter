@@ -41,6 +41,7 @@
     "string_view": "c",
     "initializer_list": "c",
     "utility": "c",
-    "datahandler.h": "c"
+    "datahandler.h": "c",
+    "typeinfo": "c"
   }
 }

@@ -27,15 +27,19 @@ inline void fillContentData(ContentData* data, const char* path) {
   data->size = getContentSize(path);
 }
 
-inline void getContentName(char* contentName, const char* path) {
-  uint ind = 0, nameStartInd = 0;
+inline void getContentName(char* name, const char* path) {
+  int ind = -1, nameStartInd = 0;
 
-  do {
-    char currentChar = path[ind];
+  while(path[++ind] != *NULL_TERMINATOR) {
+    const char currentChar = path[ind];
+    const int nameInd = ind - nameStartInd;
 
-    if(currentChar == *PATH_SEPARATOR) nameStartInd = ind + 1;
-    else contentName[ind - nameStartInd] = currentChar;
-  } while(path[ind++] != '\0');
+    if(currentChar != *PATH_SEPARATOR) name[nameInd] = currentChar;
+    else {
+      if(path[ind + 1] == *NULL_TERMINATOR) name[nameInd] = *NULL_TERMINATOR;
+      else nameStartInd = ind + 1;
+    }
+  }
 }
 
 inline size_t getContentSize(const char* path) {
@@ -53,3 +57,10 @@ inline size_t getContentSize(const char* path) {
 }
 
 inline bool isFolder(ContentData* data) { return data->size == 0; }
+
+inline bool isEmptySubContent(char* subContentName) {
+  char* currentChar = subContentName;
+  while(*currentChar == DOT_CHAR) currentChar++;
+
+  return *currentChar == *NULL_TERMINATOR;
+}

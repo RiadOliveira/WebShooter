@@ -17,9 +17,10 @@ void initializeBuffers(Buffer* buffers, size_t quantity);
 void finalizeBuffers(Buffer* buffers, size_t quantity);
 
 void fillContentData(ContentData* data, const char* path);
-void getContentName(char*, const char*);
+void getContentName(char* name, const char* path);
 size_t getContentSize(const char* path);
 
 bool isFolder(ContentData* data);
+bool isEmptySubContent(char* subContentName);
 
 #endif
