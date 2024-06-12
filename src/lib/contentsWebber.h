@@ -18,4 +18,18 @@ typedef struct {
   Buffer* buffers;
 } WriteThreadParams;
 
+void* handleContentsReading(void*);
+void* handleArchiveWriting(void*);
+
+void webFolderIntoBuffer(ContentData*, Buffer*, const char*, bool);
+void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, const char*);
+void finalizeFolderWebbingIntoBuffer(Buffer*, bool);
+
+void webFileIntoBuffer(ContentData*, Buffer*, const char*, bool);
+void handleFileReadingIntoBuffer(FILE*, Buffer*, uint*);
+
+void redirectContentToHandler(ContentData*, Buffer*, const char*, bool);
+uint parseBufferForWebbing(ContentData*, Buffer*);
+void advanceBufferAndWait(Buffer*, uint*);
+
 #endif

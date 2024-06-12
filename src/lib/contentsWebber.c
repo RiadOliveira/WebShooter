@@ -1,19 +1,5 @@
 #include "contentsWebber.h"
 
-void* handleContentsReading(void*);
-void* handleArchiveWriting(void*);
-
-void webFolderIntoBuffer(ContentData*, Buffer*, const char*, bool);
-void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, const char*);
-void finalizeFolderWebbingIntoBuffer(Buffer*, bool);
-
-void webFileIntoBuffer(ContentData*, Buffer*, const char*, bool);
-void handleFileReadingIntoBuffer(FILE*, Buffer*, uint*);
-
-void redirectContentToHandler(ContentData*, Buffer*, const char*, bool);
-uint parseBufferForWebbing(ContentData*, Buffer*);
-void advanceBufferAndWait(Buffer*, uint*);
-
 void webContentsIntoArchive(WstParams* params, const char* archivePath) {
   Buffer buffers[BUFFERS_QUANTITY];
   initializeBuffers(buffers, BUFFERS_QUANTITY);
@@ -181,7 +167,7 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   if(exceedsMaxSize) advanceBufferAndWait(buffers, &bufferInd);
   Buffer* currentBuffer = &buffers[bufferInd];
 
-  byte* bufferData = currentBuffer->data;
+  byte* bufferData = &currentBuffer->data[currentBuffer->size];
   currentBuffer->size += sizeToAdd;
 
   memcpy(bufferData, data->name, nameSize);
