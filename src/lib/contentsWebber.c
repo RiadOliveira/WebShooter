@@ -4,7 +4,8 @@ void* handleContentsReading(void*);
 void webFolderIntoBuffer(ContentData*, Buffer*, const char*, bool);
 void webFileIntoBuffer(ContentData*, Buffer*, const char*, bool);
 
-void parseBufferForWebbing(ContentData*, Buffer*, uint*);
+void redirectContentToHandler(ContentData*, Buffer*, const char*, bool);
+uint parseBufferForWebbing(ContentData*, Buffer*);
 void advanceBufferAndWait(Buffer*, uint*);
 
 void* handleArchiveWriting(void*);
@@ -27,37 +28,53 @@ void webContentsIntoArchive(WstParams* params, const char* archivePath) {
   finalizeBuffers(buffers, BUFFERS_QUANTITY);
 }
 
-inline void* handleContentsReading(void* params) {
+void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
   Buffer* buffers = parsedParams->buffers;
 
   ContentData currentData;
+  char contentName[CONTENT_NAME_MAX_SIZE];
+  currentData.name = contentName;
+
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     const char* path = parsedParams->contentPaths[ind];
     fillContentData(&currentData, path);
 
-    bool isFolder = currentData.size == 0;
     bool lastContent = ind == parsedParams->contentsQuantity - 1;
-
-    if(isFolder) webFolderIntoBuffer(&currentData, buffers, path, lastContent);
-    else webFileIntoBuffer(&currentData, buffers, path, lastContent);
+    redirectContentToHandler(&currentData, buffers, path, lastContent);
   }
 }
 
 void webFolderIntoBuffer(
   ContentData* data, Buffer* buffers, const char* path, bool lastContent
-) {}
+) {
+  DIR* folder = opendir(path);
+  const size_t pathLength = strlen(path);
+  strcat(data->name, PATH_SEPARATOR);
+
+  char currentFullPath[PATH_MAX_SIZE];
+  strcpy(currentFullPath, path);
+
+  ContentData subContentData;
+  struct dirent* subContentDirent;
+  while((subContentDirent = readdir(folder)) != NULL) {
+    appendPath(currentFullPath, pathLength, subContentDirent->d_name);
+
+    subContentData.name = subContentDirent->d_name;
+    subContentData.size = getContentSize(currentFullPath);
+    redirectContentToHandler(&subContentData, buffers, currentFullPath, false);
+  }
+
+  closedir(folder);
+}
 
 void webFileIntoBuffer(
   ContentData* data, Buffer* buffers, const char* path, bool lastContent
 ) {
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
-  parseBufferForWebbing(data, buffers, &bufferInd);
-
-  FILE* content = openFileOrExit(path, "rb");
+  uint bufferInd = parseBufferForWebbing(data, buffers);
   Buffer* currentBuffer = &buffers[bufferInd];
 
+  FILE* content = openFileOrExit(path, "rb");
   size_t bytesRead;
   do {
     const size_t currentSize = currentBuffer->size;
@@ -81,16 +98,25 @@ void webFileIntoBuffer(
   fclose(content);
 }
 
-void parseBufferForWebbing(
-  ContentData* data, Buffer* buffers, uint* bufferInd
+inline void redirectContentToHandler(
+  ContentData* data, Buffer* buffers, const char* path, bool lastContent
 ) {
-  const size_t nameSize = strlen(data->name) + 1;
-  const size_t sizeOfSizeT = sizeof(size_t);
+  if(isFolder(data)) webFolderIntoBuffer(data, buffers, path, lastContent);
+  else webFileIntoBuffer(data, buffers, path, lastContent);
+}
+
+uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
+  uint bufferInd = 0;
+  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+
+  const bool isFile = data->size > 0;
+  const size_t nameSize = strlen(data->name) + isFile;
+  const size_t sizeOfSizeT = isFile ? sizeof(size_t) : 0;
   const size_t sizeToAdd = nameSize + sizeOfSizeT;
 
-  Buffer* currentBuffer = &buffers[*bufferInd];
+  Buffer* currentBuffer = &buffers[bufferInd];
   bool exceedsMaxSize = currentBuffer->size + sizeToAdd > BUFFER_MAX_SIZE;
-  if(exceedsMaxSize) advanceBufferAndWait(buffers, bufferInd);
+  if(exceedsMaxSize) advanceBufferAndWait(buffers, &bufferInd);
 
   byte* bufferData = currentBuffer->data;
   currentBuffer->size += sizeToAdd;
@@ -99,9 +125,11 @@ void parseBufferForWebbing(
   bufferData += nameSize;
   memcpy(bufferData, &data->size, sizeOfSizeT);
   bufferData += sizeOfSizeT;
+
+  return bufferInd;
 }
 
-inline void advanceBufferAndWait(Buffer* buffers, uint* bufferInd) {
+void advanceBufferAndWait(Buffer* buffers, uint* bufferInd) {
   Buffer* selectedBuffer = &buffers[*bufferInd];
   selectedBuffer->status = READABLE;
   pthread_cond_signal(&selectedBuffer->cond);

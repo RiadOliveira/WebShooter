@@ -13,7 +13,7 @@ void parseArguments(ParsedArguments* arguments, int argc, char** argv) {
   for(int ind = 1; !earlyReturn && ind < argc; ind++) {
     char* currentArgv = argv[ind];
 
-    if(currentArgv[0] != OPTION_PREFIX) *currentContent++ = currentArgv;
+    if(*currentArgv != OPTION_PREFIX) *currentContent++ = currentArgv;
     else earlyReturn = handleOption(currentArgv, &arguments->option);
   }
 }

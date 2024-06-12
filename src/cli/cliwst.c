@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
   fillParams(&params, &arguments);
 
   switch(arguments.option) {
-    case WEB: webContentsIntoArchive(&params, arguments.contents[0]); break;
+    case WEB: webContentsIntoArchive(&params, *arguments.contents); break;
     case UNWEB: unwebArchiveIntoContents(&params); break;
     default: printHelpMenu();
   }

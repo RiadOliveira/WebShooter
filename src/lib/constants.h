@@ -7,7 +7,12 @@
 #define BUFFER_MAX_SIZE 1024 * 1000
 #define BUFFERS_QUANTITY 2
 
-#define PATH_SEPARATOR '/'
-#define NULL_TERMINATOR '\0'
+#define NULL_TERMINATOR "\0"
+
+#if defined(_WIN32) || defined(_WIN64)
+  #define PATH_SEPARATOR "\\"
+#else
+  #define PATH_SEPARATOR "/"
+#endif
 
 #endif

@@ -15,7 +15,7 @@ typedef struct {
 } WstParams;
 
 typedef struct ContentData {
-  char name[CONTENT_NAME_MAX_SIZE];
+  char* name;
   size_t size;
 } ContentData;
 

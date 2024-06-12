@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 typedef unsigned short ushort;
+typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef char byte;
 typedef char bit;
