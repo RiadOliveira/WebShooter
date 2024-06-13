@@ -66,7 +66,7 @@ void webFolderIntoBuffer(
   ContentData* data, Buffer* buffers, const char* path, bool lastContent
 ) {
   DIR* folder = opendir(path);
-  strcat(data->name, PATH_SEPARATOR);
+  concatPathSeparatorToFolderName(data->name);
 
   parseBufferForWebbing(data, buffers);
   handleFolderSubContentsReadingIntoBuffer(folder, buffers, path);
@@ -103,7 +103,7 @@ void finalizeFolderWebbingIntoBuffer(Buffer* buffers, bool lastContent) {
   if(reachedMaxSize) advanceBufferAndWait(buffers, &bufferInd);
 
   Buffer* currentBuffer = &buffers[bufferInd];
-  currentBuffer->data[currentBuffer->size++] = *PATH_SEPARATOR;
+  currentBuffer->data[currentBuffer->size++] = PATH_SEPARATOR;
 
   if(lastContent) {
     advanceBufferAndWait(buffers, &bufferInd);

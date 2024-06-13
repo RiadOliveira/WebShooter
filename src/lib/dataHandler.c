@@ -30,16 +30,23 @@ inline void fillContentData(ContentData* data, const char* path) {
 inline void getContentName(char* name, const char* path) {
   int ind = -1, nameStartInd = 0;
 
-  while(path[++ind] != *NULL_TERMINATOR) {
+  while(path[++ind] != NULL_TERMINATOR) {
     const char currentChar = path[ind];
     const int nameInd = ind - nameStartInd;
 
-    if(currentChar != *PATH_SEPARATOR) name[nameInd] = currentChar;
+    if(currentChar != PATH_SEPARATOR) name[nameInd] = currentChar;
     else {
-      if(path[ind + 1] == *NULL_TERMINATOR) name[nameInd] = *NULL_TERMINATOR;
-      else nameStartInd = ind + 1;
+      const int nextInd = ind + 1;
+      if(path[nextInd] == NULL_TERMINATOR) name[nameInd] = NULL_TERMINATOR;
+      else nameStartInd = nextInd;
     }
   }
+}
+
+inline void concatPathSeparatorToFolderName(char* name) {
+  const size_t length = strlen(name);
+  name[length] = PATH_SEPARATOR;
+  name[length + 1] = NULL_TERMINATOR;
 }
 
 inline size_t getContentSize(const char* path) {
@@ -62,5 +69,5 @@ inline bool isEmptySubContent(char* subContentName) {
   char* currentChar = subContentName;
   while(*currentChar == DOT_CHAR) currentChar++;
 
-  return *currentChar == *NULL_TERMINATOR;
+  return *currentChar == NULL_TERMINATOR;
 }

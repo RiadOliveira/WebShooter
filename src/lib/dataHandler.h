@@ -18,6 +18,7 @@ void finalizeBuffers(Buffer* buffers, size_t quantity);
 
 void fillContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);
+void concatPathSeparatorToFolderName(char* name);
 size_t getContentSize(const char* path);
 
 bool isFolder(ContentData* data);
