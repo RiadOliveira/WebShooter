@@ -14,7 +14,7 @@ set(HEADERS
   src/lib/constants.h
   src/lib/contentHandler.h
   src/lib/contentsWebber.h
-  src/lib/fileHandler.h
+  src/lib/fileManager.h
   src/lib/libwst.h
 
   src/utils/errorThrower.h
@@ -30,7 +30,7 @@ set(SOURCES
   src/lib/bufferHandler.c
   src/lib/contentHandler.c
   src/lib/contentsWebber.c
-  src/lib/fileHandler.c
+  src/lib/fileManager.c
 
   src/utils/errorThrower.c
   src/utils/mathUtils.c

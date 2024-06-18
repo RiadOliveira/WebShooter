@@ -3,15 +3,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "constants.h"
 #include "errorThrower.h"
+#include "fileManager.h"
 #include "shortcutTypes.h"
-
-#if defined(_WIN32) || defined(_WIN64)
-  #define stat _stat
-#endif
 
 typedef struct ContentData {
   char* name;

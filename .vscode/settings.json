@@ -4,6 +4,10 @@
     "contentswebber.h": "c",
     "filehandler.h": "c",
     "errorthrower.h": "c",
-    "constants.h": "c"
+    "constants.h": "c",
+    "filemanager.h": "c",
+    "string.h": "c",
+    "contenthandler.h": "c",
+    "archiveunwebber.h": "c"
   }
 }

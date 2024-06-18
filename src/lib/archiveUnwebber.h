@@ -2,7 +2,7 @@
 #define ARCHIVE_UNWEBBER_H
 
 #include "bufferHandler.h"
-#include "fileHandler.h"
+#include "contentHandler.h"
 #include "libwst.h"
 
 typedef struct {

@@ -33,13 +33,13 @@ inline void concatPathSeparatorToFolderName(char* name) {
 inline size_t getContentSize(const char* path) {
   struct stat pathStat;
   if(stat(path, &pathStat) != 0) {
-    printErrorAndExit(LOCATING_ERROR_MESSAGE, path);
+    exitWithMessage(LOCATING_ERROR_MESSAGE, path);
   }
 
   const uint stMode = pathStat.st_mode;
   const bool file = S_ISREG(stMode);
   const bool folder = S_ISDIR(stMode);
-  if(!file && !folder) printErrorAndExit(LOCATING_ERROR_MESSAGE, path);
+  if(!file && !folder) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
   return file ? pathStat.st_size : 0;
 }

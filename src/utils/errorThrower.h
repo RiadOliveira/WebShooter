@@ -5,6 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void printErrorAndExit(const char* format, ...);
+void exitWithMessage(const char* format, ...);
 
 #endif

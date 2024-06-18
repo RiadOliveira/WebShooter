@@ -60,7 +60,7 @@ void* handleArchiveWriting(void* params) {
 }
 
 void webFolderIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
-  DIR* folder = opendir(path);
+  DIR* folder = openFolderOrExit(path);
   concatPathSeparatorToFolderName(data->name);
 
   parseBufferForWebbing(data, buffers);
@@ -138,8 +138,8 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   const size_t sizeOfSizeT = isFile ? sizeof(size_t) : 0;
   const size_t sizeToAdd = nameSize + sizeOfSizeT;
 
-  bool exceedsMaxSize = buffers[bufferInd].size + sizeToAdd > BUFFER_MAX_SIZE;
-  if(exceedsMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
+  bool reachesMaxSize = buffers[bufferInd].size + sizeToAdd >= BUFFER_MAX_SIZE;
+  if(reachesMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
   Buffer* currentBuffer = &buffers[bufferInd];
 
   byte* bufferData = &currentBuffer->data[currentBuffer->size];
