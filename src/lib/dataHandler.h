@@ -1,7 +1,6 @@
 #ifndef DATA_HANDLER_H
 #define DATA_HANDLER_H
 
-#include <pthread.h>
 #include <sys/stat.h>
 
 #include "constants.h"

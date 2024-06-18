@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
   fillParams(&params, &arguments);
 
   switch(arguments.option) {
-    case WEB: webContentsIntoArchive(&params, *arguments.contents); break;
+    case WEB: webContentsIntoArchive(&params); break;
     case UNWEB: unwebArchiveIntoContents(&params); break;
     default: printHelpMenu();
   }
@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
 }
 
 inline void fillParams(WstParams* params, ParsedArguments* arguments) {
-  const bool webOption = arguments->option == WEB;
-
-  params->contentOrArchivePaths = (const char**)&arguments->contents[webOption];
-  params->contentsOrArchivesQuantity = arguments->contentsQuantity - webOption;
+  params->archivePath = *arguments->contents;
+  params->contentPaths = (const char**)&arguments->contents[1];
+  params->contentsQuantity = arguments->contentsQuantity - 1;
 }

@@ -2,19 +2,21 @@
 
 const char* USAGE_INSTRUCTIONS_GENERAL = "Usage: wst [options] <arguments>\n";
 const char* USAGE_INSTRUCTIONS_WEB =
-  "Usage: wst -w <output_archive_path> <content_path1> <content_path2> ...\n";
+  "Usage: wst -w <output_archive_path> <content_path1> [content_path2] ...\n";
 const char* USAGE_INSTRUCTIONS_UNWEB =
-  "Usage: wst -u <archive_to_unweb_path1> <archive_to_unweb_path2> ...\n";
+  "Usage: wst -u <archive_to_unweb_path> [contents_output_path]\n";
 const char* HELP_MENU =
   "%sDescription: WebShooter is a tool to web files and folders into or "
   "unweb from a single archive.\n\n"
   "Options:\n"
   "  -w, --web\tWeb files or folders into a single archive.\n"
-  "\t\tRequires an output file and one or more contents (files or folders).\n"
+  "\t\tRequires an output archive path and at least one content (file or "
+  "folder).\n"
   "\t\t%s\n"
-  "  -u, --unweb\tUnweb previously webbed archives into their original "
+  "  -u, --unweb\tUnweb a previously webbed archive into its original "
   "contents.\n"
-  "\t\tRequires one or more input archives to be unwebbed.\n"
+  "\t\tRequires an input archive to be unwebbed. If the output path for the "
+  "contents is not provided, the current directory will be used.\n"
   "\t\t%s\n"
   "  -h, --help\tShow this help message.\n";
 

@@ -3,7 +3,7 @@
 
 #include "libTypes.h"
 
-void webContentsIntoArchive(WstParams* params, const char* archivePath);
+void webContentsIntoArchive(WstParams* params);
 void unwebArchiveIntoContents(WstParams* params);
 
 #endif

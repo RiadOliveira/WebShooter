@@ -1,17 +1,17 @@
 #include "contentsWebber.h"
 
-void webContentsIntoArchive(WstParams* params, const char* archivePath) {
+void webContentsIntoArchive(WstParams* params) {
   Buffer buffers[BUFFERS_QUANTITY];
   initializeBuffers(buffers, BUFFERS_QUANTITY);
 
   pthread_t readThread;
   ReadThreadParams readParams = {
-    params->contentOrArchivePaths, params->contentsOrArchivesQuantity, buffers
+    params->contentPaths, params->contentsQuantity, buffers
   };
   pthread_create(&readThread, NULL, handleContentsReading, &readParams);
 
   pthread_t writingThread;
-  WriteThreadParams writingParams = {archivePath, buffers};
+  WriteThreadParams writingParams = {params->archivePath, buffers};
   pthread_create(&writingThread, NULL, handleArchiveWriting, &writingParams);
 
   pthread_join(writingThread, NULL);
