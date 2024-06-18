@@ -6,7 +6,6 @@ set(MAIN_FILE "src/cli/cliwst.c")
 
 set(HEADERS
   src/cli/cliTypes.h
-  src/cli/cwdGetter.h
   src/cli/parser.h
   src/cli/validator.h
 
@@ -24,7 +23,6 @@ set(HEADERS
 )
 set(SOURCES
   src/cli/cliwst.c
-  src/cli/cwdGetter.c
   src/cli/parser.c
   src/cli/validator.c
 

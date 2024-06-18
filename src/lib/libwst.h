@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 typedef struct {
-  const char* cwd;
   const char* archivePath;
   const char** contentPaths;
   size_t contentsQuantity;

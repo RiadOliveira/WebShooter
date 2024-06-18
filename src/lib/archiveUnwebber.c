@@ -39,10 +39,7 @@ void* handleContentsWriting(void* params) {
 
   uint bufferInd = 0;
   Buffer* currentBuffer = &parsedParams->buffers[bufferInd];
-  pthread_mutex_t* mutex = &currentBuffer->mutex;
-
   do {
     waitBufferReachStatus(currentBuffer, READABLE);
-
   } while(currentBuffer->status != EMPTY);
 }

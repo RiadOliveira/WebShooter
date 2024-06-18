@@ -1,4 +1,3 @@
-#include "cwdGetter.h"
 #include "libwst.h"
 #include "parser.h"
 #include "validator.h"
@@ -10,10 +9,7 @@ int main(int argc, char** argv) {
   parseArguments(&arguments, argc, argv);
   validateArguments(&arguments);
 
-  char cwd[PATH_MAX];
-  getCwdOrExit(cwd, PATH_MAX);
-
-  WstParams params = {cwd};
+  WstParams params;
   fillParams(&params, &arguments);
 
   switch(arguments.option) {

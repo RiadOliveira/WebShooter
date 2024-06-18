@@ -44,7 +44,6 @@ void* handleArchiveWriting(void* params) {
 
   uint bufferInd = 0;
   Buffer* currentBuffer = &parsedParams->buffers[bufferInd];
-  pthread_mutex_t* mutex = &currentBuffer->mutex;
 
   do {
     waitBufferReachStatus(currentBuffer, READABLE);
@@ -55,7 +54,6 @@ void* handleArchiveWriting(void* params) {
 
     if(++bufferInd == BUFFERS_QUANTITY) bufferInd = 0;
     currentBuffer = &parsedParams->buffers[bufferInd];
-    mutex = &currentBuffer->mutex;
   } while(currentBuffer->status != EMPTY);
 
   fclose(archive);
