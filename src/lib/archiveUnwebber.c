@@ -28,7 +28,7 @@ void* handleArchiveReading(void* params) {
     byte* currentData = currentBuffer->data;
     currentBuffer->size = fread(currentData, 1, BUFFER_MAX_SIZE, archive);
 
-    advanceBufferAndWait(parsedParams->buffers, &bufferInd);
+    advanceBufferAndWaitForNext(parsedParams->buffers, &bufferInd);
   } while(currentBuffer->size > 0);
 
   fclose(archive);
@@ -36,4 +36,13 @@ void* handleArchiveReading(void* params) {
 
 void* handleContentsWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
+
+  uint bufferInd = 0;
+  Buffer* currentBuffer = &parsedParams->buffers[bufferInd];
+  pthread_mutex_t* mutex = &currentBuffer->mutex;
+
+  do {
+    waitBufferReachStatus(currentBuffer, READABLE);
+
+  } while(currentBuffer->status != EMPTY);
 }

@@ -29,10 +29,13 @@ void* handleContentsReading(void* params) {
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     const char* path = parsedParams->contentPaths[ind];
     fillContentData(&currentData, path);
-
-    bool lastContent = ind == parsedParams->contentsQuantity - 1;
-    redirectContentToHandler(&currentData, buffers, path, lastContent);
+    redirectContentToHandler(&currentData, buffers, path);
   }
+
+  uint bufferInd = 0;
+  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+  advanceBufferAndWaitForNext(buffers, &bufferInd);
+  buffers[bufferInd].status = EMPTY;
 }
 
 void* handleArchiveWriting(void* params) {
@@ -40,37 +43,39 @@ void* handleArchiveWriting(void* params) {
   FILE* archive = openFileOrExit(parsedParams->archivePath, WRITE_BINARY_MODE);
 
   uint bufferInd = 0;
-  Buffer* selectedBuffer = &parsedParams->buffers[bufferInd];
-  pthread_mutex_t* mutex = &selectedBuffer->mutex;
+  Buffer* currentBuffer = &parsedParams->buffers[bufferInd];
+  pthread_mutex_t* mutex = &currentBuffer->mutex;
 
   do {
-    pthread_mutex_lock(mutex);
-    while(selectedBuffer->status != READABLE) {
-      pthread_cond_wait(&selectedBuffer->cond, mutex);
-    }
-    pthread_mutex_unlock(mutex);
+    waitBufferReachStatus(currentBuffer, READABLE);
+    fwrite(currentBuffer->data, 1, currentBuffer->size, archive);
 
-    fwrite(selectedBuffer->data, 1, selectedBuffer->size, archive);
-    selectedBuffer->size = selectedBuffer->status = UNINITIALIZED;
-    pthread_cond_signal(&selectedBuffer->cond);
+    currentBuffer->size = currentBuffer->status = UNINITIALIZED;
+    pthread_cond_signal(&currentBuffer->cond);
 
     if(++bufferInd == BUFFERS_QUANTITY) bufferInd = 0;
-    selectedBuffer = &parsedParams->buffers[bufferInd];
-    mutex = &selectedBuffer->mutex;
-  } while(selectedBuffer->status != EMPTY);
+    currentBuffer = &parsedParams->buffers[bufferInd];
+    mutex = &currentBuffer->mutex;
+  } while(currentBuffer->status != EMPTY);
 
   fclose(archive);
 }
 
-void webFolderIntoBuffer(
-  ContentData* data, Buffer* buffers, const char* path, bool lastContent
-) {
+void webFolderIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
   DIR* folder = opendir(path);
   concatPathSeparatorToFolderName(data->name);
 
   parseBufferForWebbing(data, buffers);
   handleFolderSubContentsReadingIntoBuffer(folder, buffers, path);
-  finalizeFolderWebbingIntoBuffer(buffers, lastContent);
+
+  uint bufferInd = 0;
+  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+
+  bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
+  if(reachedMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
+
+  Buffer* currentBuffer = &buffers[bufferInd];
+  currentBuffer->data[currentBuffer->size++] = PATH_SEPARATOR;
 
   closedir(folder);
 }
@@ -91,47 +96,17 @@ void handleFolderSubContentsReadingIntoBuffer(
     appendPath(currentFullPath, pathLength, subContentDirent->d_name);
     subContentData.name = subContentDirent->d_name;
     subContentData.size = getContentSize(currentFullPath);
-    redirectContentToHandler(&subContentData, buffers, currentFullPath, false);
+    redirectContentToHandler(&subContentData, buffers, currentFullPath);
   }
 }
 
-void finalizeFolderWebbingIntoBuffer(Buffer* buffers, bool lastContent) {
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
-
-  bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
-  if(reachedMaxSize) advanceBufferAndWait(buffers, &bufferInd);
-
-  Buffer* currentBuffer = &buffers[bufferInd];
-  currentBuffer->data[currentBuffer->size++] = PATH_SEPARATOR;
-
-  if(lastContent) {
-    advanceBufferAndWait(buffers, &bufferInd);
-    buffers[bufferInd].status = EMPTY;
-  }
-}
-
-void webFileIntoBuffer(
-  ContentData* data, Buffer* buffers, const char* path, bool lastContent
-) {
-  uint bufferInd = parseBufferForWebbing(data, buffers);
+void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
   FILE* content = openFileOrExit(path, READ_BINARY_MODE);
-  handleFileReadingIntoBuffer(content, buffers, &bufferInd);
 
-  if(lastContent) {
-    advanceBufferAndWait(buffers, &bufferInd);
-    buffers[bufferInd].status = EMPTY;
-  }
+  uint bufferInd = parseBufferForWebbing(data, buffers);
+  Buffer* currentBuffer = &buffers[bufferInd];
 
-  fclose(content);
-}
-
-void handleFileReadingIntoBuffer(
-  FILE* content, Buffer* buffers, uint* bufferInd
-) {
-  Buffer* currentBuffer = &buffers[*bufferInd];
   size_t bytesRead;
-
   do {
     const size_t currentSize = currentBuffer->size;
     const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
@@ -141,17 +116,19 @@ void handleFileReadingIntoBuffer(
     currentBuffer->size += bytesRead;
 
     if(maxSizeReadable == bytesRead) {
-      advanceBufferAndWait(buffers, bufferInd);
-      currentBuffer = &buffers[*bufferInd];
+      advanceBufferAndWaitForNext(buffers, &bufferInd);
+      currentBuffer = &buffers[bufferInd];
     }
   } while(bytesRead > 0);
+
+  fclose(content);
 }
 
 inline void redirectContentToHandler(
-  ContentData* data, Buffer* buffers, const char* path, bool lastContent
+  ContentData* data, Buffer* buffers, const char* path
 ) {
-  if(isFolder(data)) webFolderIntoBuffer(data, buffers, path, lastContent);
-  else webFileIntoBuffer(data, buffers, path, lastContent);
+  bool folder = isFolder(data);
+  (folder ? webFolderIntoBuffer : webFileIntoBuffer)(data, buffers, path);
 }
 
 uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
@@ -164,7 +141,7 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   const size_t sizeToAdd = nameSize + sizeOfSizeT;
 
   bool exceedsMaxSize = buffers[bufferInd].size + sizeToAdd > BUFFER_MAX_SIZE;
-  if(exceedsMaxSize) advanceBufferAndWait(buffers, &bufferInd);
+  if(exceedsMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
   Buffer* currentBuffer = &buffers[bufferInd];
 
   byte* bufferData = &currentBuffer->data[currentBuffer->size];

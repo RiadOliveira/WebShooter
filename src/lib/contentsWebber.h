@@ -22,14 +22,12 @@ typedef struct {
 void* handleContentsReading(void*);
 void* handleArchiveWriting(void*);
 
-void webFolderIntoBuffer(ContentData*, Buffer*, const char*, bool);
+void webFolderIntoBuffer(ContentData*, Buffer*, const char*);
 void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, const char*);
-void finalizeFolderWebbingIntoBuffer(Buffer*, bool);
 
-void webFileIntoBuffer(ContentData*, Buffer*, const char*, bool);
-void handleFileReadingIntoBuffer(FILE*, Buffer*, uint*);
+void webFileIntoBuffer(ContentData*, Buffer*, const char*);
 
-void redirectContentToHandler(ContentData*, Buffer*, const char*, bool);
+void redirectContentToHandler(ContentData*, Buffer*, const char*);
 uint parseBufferForWebbing(ContentData*, Buffer*);
 
 #endif
