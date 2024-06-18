@@ -3,7 +3,8 @@
 
 #include <dirent.h>
 
-#include "dataHandler.h"
+#include "bufferHandler.h"
+#include "contentHandler.h"
 #include "fileHandler.h"
 #include "libwst.h"
 
@@ -30,6 +31,5 @@ void handleFileReadingIntoBuffer(FILE*, Buffer*, uint*);
 
 void redirectContentToHandler(ContentData*, Buffer*, const char*, bool);
 uint parseBufferForWebbing(ContentData*, Buffer*);
-void advanceBufferAndWait(Buffer*, uint*);
 
 #endif

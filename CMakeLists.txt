@@ -11,15 +11,14 @@ set(HEADERS
   src/cli/validator.h
 
   src/lib/archiveUnwebber.h
+  src/lib/bufferHandler.h
   src/lib/constants.h
+  src/lib/contentHandler.h
   src/lib/contentsWebber.h
-  src/lib/dataHandler.h
-  src/lib/libTypes.h
+  src/lib/fileHandler.h
   src/lib/libwst.h
-  src/lib/pathHandler.h
 
   src/utils/errorThrower.h
-  src/utils/fileHandler.h
   src/utils/mathUtils.h
   src/utils/shortcutTypes.h
 )
@@ -30,12 +29,12 @@ set(SOURCES
   src/cli/validator.c
 
   src/lib/archiveUnwebber.c
+  src/lib/bufferHandler.c
+  src/lib/contentHandler.c
   src/lib/contentsWebber.c
-  src/lib/dataHandler.c
-  src/lib/pathHandler.c
+  src/lib/fileHandler.c
 
   src/utils/errorThrower.c
-  src/utils/fileHandler.c
   src/utils/mathUtils.c
 )
 

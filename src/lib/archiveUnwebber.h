@@ -1,7 +1,8 @@
 #ifndef ARCHIVE_UNWEBBER_H
 #define ARCHIVE_UNWEBBER_H
 
-#include "dataHandler.h"
+#include "bufferHandler.h"
+#include "fileHandler.h"
 #include "libwst.h"
 
 typedef struct {

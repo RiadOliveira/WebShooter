@@ -37,7 +37,7 @@ void* handleContentsReading(void* params) {
 
 void* handleArchiveWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
-  FILE* archive = openFileOrExit(parsedParams->archivePath, "wb");
+  FILE* archive = openFileOrExit(parsedParams->archivePath, WRITE_BINARY_MODE);
 
   uint bufferInd = 0;
   Buffer* selectedBuffer = &parsedParams->buffers[bufferInd];
@@ -115,7 +115,7 @@ void webFileIntoBuffer(
   ContentData* data, Buffer* buffers, const char* path, bool lastContent
 ) {
   uint bufferInd = parseBufferForWebbing(data, buffers);
-  FILE* content = openFileOrExit(path, "rb");
+  FILE* content = openFileOrExit(path, READ_BINARY_MODE);
   handleFileReadingIntoBuffer(content, buffers, &bufferInd);
 
   if(lastContent) {
@@ -176,20 +176,4 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   bufferData += sizeOfSizeT;
 
   return bufferInd;
-}
-
-void advanceBufferAndWait(Buffer* buffers, uint* bufferInd) {
-  Buffer* selectedBuffer = &buffers[*bufferInd];
-  selectedBuffer->status = READABLE;
-  pthread_cond_signal(&selectedBuffer->cond);
-
-  if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
-  selectedBuffer = &buffers[*bufferInd];
-  pthread_mutex_t* mutex = &selectedBuffer->mutex;
-
-  pthread_mutex_lock(mutex);
-  while(selectedBuffer->status != UNINITIALIZED) {
-    pthread_cond_wait(&selectedBuffer->cond, mutex);
-  }
-  pthread_mutex_unlock(mutex);
 }

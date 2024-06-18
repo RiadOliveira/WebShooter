@@ -1,19 +1,22 @@
-#ifndef DATA_HANDLER_H
-#define DATA_HANDLER_H
+#ifndef CONTENT_HANDLER_H
+#define CONTENT_HANDLER_H
 
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 
 #include "constants.h"
 #include "errorThrower.h"
-#include "libTypes.h"
-#include "pathHandler.h"
+#include "shortcutTypes.h"
 
 #if defined(_WIN32) || defined(_WIN64)
   #define stat _stat
 #endif
 
-void initializeBuffers(Buffer* buffers, size_t quantity);
-void finalizeBuffers(Buffer* buffers, size_t quantity);
+typedef struct ContentData {
+  char* name;
+  size_t size;
+} ContentData;
 
 void fillContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);

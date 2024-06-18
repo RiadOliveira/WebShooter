@@ -1,26 +1,7 @@
-#include "dataHandler.h"
+#include "contentHandler.h"
 
 const char* LOCATING_ERROR_MESSAGE =
   "Error while locating the content identified by the path: %s\n";
-
-inline void initializeBuffers(Buffer* buffers, size_t quantity) {
-  for(size_t ind = 0; ind < quantity; ind++) {
-    Buffer* currentBuffer = &buffers[ind];
-
-    currentBuffer->size = currentBuffer->status = UNINITIALIZED;
-    pthread_mutex_init(&currentBuffer->mutex, NULL);
-    pthread_cond_init(&currentBuffer->cond, NULL);
-  }
-}
-
-inline void finalizeBuffers(Buffer* buffers, size_t quantity) {
-  for(size_t ind = 0; ind < quantity; ind++) {
-    Buffer* currentBuffer = &buffers[ind];
-
-    pthread_mutex_destroy(&currentBuffer->mutex);
-    pthread_cond_destroy(&currentBuffer->cond);
-  }
-}
 
 inline void fillContentData(ContentData* data, const char* path) {
   getContentName(data->name, path);
