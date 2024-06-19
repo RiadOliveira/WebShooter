@@ -90,10 +90,10 @@ void handleFolderSubContentsReadingIntoBuffer(
   struct dirent* subContentDirent;
   while((subContentDirent = readdir(folder)) != NULL) {
     if(isEmptySubContent(subContentDirent->d_name)) continue;
-
     appendPath(currentFullPath, pathLength, subContentDirent->d_name);
+
     subContentData.name = subContentDirent->d_name;
-    subContentData.size = getContentSize(currentFullPath);
+    setContentMetadata(&subContentData.metadata, currentFullPath);
     redirectContentToHandler(&subContentData, buffers, currentFullPath);
   }
 }
@@ -133,10 +133,10 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   uint bufferInd = 0;
   while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
 
-  const bool isFile = data->size > 0;
-  const size_t nameSize = strlen(data->name) + isFile;
-  const size_t sizeOfSizeT = isFile ? sizeof(size_t) : 0;
-  const size_t sizeToAdd = nameSize + sizeOfSizeT;
+  const bool file = isFile(data);
+  const size_t nameSize = strlen(data->name) + file;
+  const size_t metadataSize = sizeof(Metadata) - (file ? 0 : sizeof(size_t));
+  const size_t sizeToAdd = nameSize + metadataSize;
 
   bool reachesMaxSize = buffers[bufferInd].size + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
@@ -147,8 +147,8 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
 
   memcpy(bufferData, data->name, nameSize);
   bufferData += nameSize;
-  memcpy(bufferData, &data->size, sizeOfSizeT);
-  bufferData += sizeOfSizeT;
+  memcpy(bufferData, &data->metadata, metadataSize);
+  bufferData += metadataSize;
 
   return bufferInd;
 }

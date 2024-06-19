@@ -5,7 +5,7 @@ const char* LOCATING_ERROR_MESSAGE =
 
 inline void fillContentData(ContentData* data, const char* path) {
   getContentName(data->name, path);
-  data->size = getContentSize(path);
+  setContentMetadata(&data->metadata, path);
 }
 
 inline void getContentName(char* name, const char* path) {
@@ -24,27 +24,29 @@ inline void getContentName(char* name, const char* path) {
   }
 }
 
-inline void concatPathSeparatorToFolderName(char* name) {
-  const size_t length = strlen(name);
-  name[length] = PATH_SEPARATOR;
-  name[length + 1] = NULL_TERMINATOR;
-}
-
-inline size_t getContentSize(const char* path) {
+inline void setContentMetadata(Metadata* metadata, const char* path) {
   struct stat pathStat;
-  if(stat(path, &pathStat) != 0) {
-    exitWithMessage(LOCATING_ERROR_MESSAGE, path);
-  }
+  if(stat(path, &pathStat) != 0) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
   const uint stMode = pathStat.st_mode;
   const bool file = S_ISREG(stMode);
   const bool folder = S_ISDIR(stMode);
   if(!file && !folder) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
-  return file ? pathStat.st_size : 0;
+  metadata->size = file ? pathStat.st_size : 0;
+  metadata->mode = stMode;
+  metadata->atime = pathStat.st_atime;
+  metadata->mtime = pathStat.st_mtime;
 }
 
-inline bool isFolder(ContentData* data) { return data->size == 0; }
+inline void concatPathSeparatorToFolderName(char* name) {
+  const size_t length = strlen(name);
+  name[length] = PATH_SEPARATOR;
+  name[length + 1] = NULL_TERMINATOR;
+}
+
+inline bool isFolder(ContentData* data) { return data->metadata.size == 0; }
+inline bool isFile(ContentData* data) { return data->metadata.size > 0; }
 
 inline bool isEmptySubContent(char* subContentName) {
   char* currentChar = subContentName;

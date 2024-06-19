@@ -16,6 +16,12 @@
 #define READ_BINARY_MODE "rb"
 #define WRITE_BINARY_MODE "wb"
 
+typedef struct {
+  uint mode;
+  long atime, mtime;
+  size_t size;
+} Metadata;
+
 FILE* openFileOrExit(const char* path, const char* modes);
 DIR* openFolderOrExit(const char* path);
 

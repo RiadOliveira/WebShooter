@@ -9,17 +9,18 @@
 #include "fileManager.h"
 #include "shortcutTypes.h"
 
-typedef struct ContentData {
+typedef struct {
   char* name;
-  size_t size;
+  Metadata metadata;
 } ContentData;
 
 void fillContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);
+void setContentMetadata(Metadata* metadata, const char* path);
 void concatPathSeparatorToFolderName(char* name);
-size_t getContentSize(const char* path);
 
 bool isFolder(ContentData* data);
+bool isFile(ContentData* data);
 bool isEmptySubContent(char* subContentName);
 
 #endif
