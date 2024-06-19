@@ -9,6 +9,9 @@
     "string.h": "c",
     "contenthandler.h": "c",
     "archiveunwebber.h": "c",
-    "shortcuttypes.h": "c"
+    "shortcuttypes.h": "c",
+    "array": "c",
+    "string": "c",
+    "string_view": "c"
   }
 }

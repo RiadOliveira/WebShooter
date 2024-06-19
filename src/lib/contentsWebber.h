@@ -19,12 +19,12 @@ typedef struct {
 void* handleContentsReading(void*);
 void* handleArchiveWriting(void*);
 
-void webFolderIntoBuffer(ContentData*, Buffer*, const char*);
-void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, const char*);
+void webFolderIntoBuffer(ContentData*, Buffer*, char*, size_t);
+void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, char*, size_t);
 
 void webFileIntoBuffer(ContentData*, Buffer*, const char*);
 
-void redirectContentToHandler(ContentData*, Buffer*, const char*);
+void redirectContentToHandler(ContentData*, Buffer*, const char*, char*);
 uint parseBufferForWebbing(ContentData*, Buffer*);
 
 #endif

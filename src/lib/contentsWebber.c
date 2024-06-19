@@ -22,14 +22,19 @@ void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
   Buffer* buffers = parsedParams->buffers;
 
-  ContentData currentData;
-  char contentName[CONTENT_NAME_MAX_SIZE];
-  currentData.name = contentName;
+  ContentData data;
+  char contentName[CONTENT_NAME_MAX_SIZE], fullPath[PATH_MAX_SIZE];
+  data.name = contentName;
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     const char* path = parsedParams->contentPaths[ind];
-    fillContentData(&currentData, path);
-    redirectContentToHandler(&currentData, buffers, path);
+    fillContentData(&data, path);
+
+    if(isFile(&data)) webFileIntoBuffer(&data, buffers, path);
+    else {
+      strcpy(fullPath, path);
+      webFolderIntoBuffer(&data, buffers, fullPath, strlen(path));
+    }
   }
 
   uint bufferInd = 0;
@@ -59,12 +64,16 @@ void* handleArchiveWriting(void* params) {
   fclose(archive);
 }
 
-void webFolderIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
-  DIR* folder = openFolderOrExit(path);
+void webFolderIntoBuffer(
+  ContentData* data, Buffer* buffers, char* fullPath, size_t pathLength
+) {
+  DIR* folder = openFolderOrExit(fullPath);
   concatPathSeparatorToFolderName(data->name);
 
   parseBufferForWebbing(data, buffers);
-  handleFolderSubContentsReadingIntoBuffer(folder, buffers, path);
+  handleFolderSubContentsReadingIntoBuffer(
+    folder, buffers, fullPath, pathLength
+  );
 
   uint bufferInd = 0;
   while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
@@ -79,22 +88,23 @@ void webFolderIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
 }
 
 void handleFolderSubContentsReadingIntoBuffer(
-  DIR* folder, Buffer* buffers, const char* path
+  DIR* folder, Buffer* buffers, char* fullPath, size_t pathLength
 ) {
-  ContentData subContentData;
-  const size_t pathLength = strlen(path);
-
-  char currentFullPath[PATH_MAX_SIZE];
-  strcpy(currentFullPath, path);
-
+  ContentData subData;
   struct dirent* subContentDirent;
+
   while((subContentDirent = readdir(folder)) != NULL) {
     if(isEmptySubContent(subContentDirent->d_name)) continue;
-    appendPath(currentFullPath, pathLength, subContentDirent->d_name);
+    appendPath(fullPath, pathLength, subContentDirent->d_name);
 
-    subContentData.name = subContentDirent->d_name;
-    setContentMetadata(&subContentData.metadata, currentFullPath);
-    redirectContentToHandler(&subContentData, buffers, currentFullPath);
+    subData.name = subContentDirent->d_name;
+    setContentMetadata(&subData.metadata, fullPath);
+
+    if(isFile(&subData)) webFileIntoBuffer(&subData, buffers, fullPath);
+    else {
+      const size_t fullLength = pathLength + strlen(&fullPath[pathLength]);
+      webFolderIntoBuffer(&subData, buffers, fullPath, fullLength);
+    }
   }
 }
 
@@ -104,29 +114,32 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
   uint bufferInd = parseBufferForWebbing(data, buffers);
   Buffer* currentBuffer = &buffers[bufferInd];
 
-  size_t bytesRead;
+  bool hasMoreBytesToRead;
   do {
     const size_t currentSize = currentBuffer->size;
     const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
 
     byte* currentData = &currentBuffer->data[currentSize];
-    bytesRead = fread(currentData, 1, maxSizeReadable, content);
+    const size_t bytesRead = fread(currentData, 1, maxSizeReadable, content);
     currentBuffer->size += bytesRead;
 
-    if(maxSizeReadable == bytesRead) {
+    if(hasMoreBytesToRead = bytesRead == maxSizeReadable) {
       advanceBufferAndWaitForNext(buffers, &bufferInd);
       currentBuffer = &buffers[bufferInd];
     }
-  } while(bytesRead > 0);
+  } while(hasMoreBytesToRead);
 
   fclose(content);
 }
 
 inline void redirectContentToHandler(
-  ContentData* data, Buffer* buffers, const char* path
+  ContentData* data, Buffer* buffers, const char* path, char* fullPath
 ) {
-  bool folder = isFolder(data);
-  (folder ? webFolderIntoBuffer : webFileIntoBuffer)(data, buffers, path);
+  if(!isFolder(data)) webFileIntoBuffer(data, buffers, path);
+  else {
+    strcpy(fullPath, path);
+    webFolderIntoBuffer(data, buffers, fullPath, strlen(path));
+  }
 }
 
 uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
