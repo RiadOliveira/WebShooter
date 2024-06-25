@@ -153,15 +153,13 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
 
   bool reachesMaxSize = buffers[bufferInd].size + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
-  Buffer* currentBuffer = &buffers[bufferInd];
 
+  Buffer* currentBuffer = &buffers[bufferInd];
   byte* bufferData = &currentBuffer->data[currentBuffer->size];
-  currentBuffer->size += sizeToAdd;
 
   memcpy(bufferData, data->name, nameSize);
-  bufferData += nameSize;
-  memcpy(bufferData, &data->metadata, metadataSize);
-  bufferData += metadataSize;
+  memcpy(&bufferData[nameSize], &data->metadata, metadataSize);
+  currentBuffer->size += sizeToAdd;
 
   return bufferInd;
 }

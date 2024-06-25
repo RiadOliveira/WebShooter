@@ -34,8 +34,6 @@ inline void waitBufferReachStatus(Buffer* buffer, BufferStatus status) {
   pthread_mutex_t* mutex = &buffer->mutex;
 
   pthread_mutex_lock(mutex);
-  while(buffer->status != status) {
-    pthread_cond_wait(&buffer->cond, mutex);
-  }
+  while(buffer->status != status) pthread_cond_wait(&buffer->cond, mutex);
   pthread_mutex_unlock(mutex);
 }
