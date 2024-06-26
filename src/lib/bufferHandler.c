@@ -4,7 +4,8 @@ inline void initializeBuffers(Buffer* buffers, size_t quantity) {
   for(size_t ind = 0; ind < quantity; ind++) {
     Buffer* currentBuffer = &buffers[ind];
 
-    currentBuffer->size = currentBuffer->status = UNINITIALIZED;
+    currentBuffer->size = currentBuffer->consumedSize = 0;
+    currentBuffer->status = UNINITIALIZED;
     pthread_mutex_init(&currentBuffer->mutex, NULL);
     pthread_cond_init(&currentBuffer->cond, NULL);
   }

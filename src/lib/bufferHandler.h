@@ -5,14 +5,14 @@
 
 #include "shortcutTypes.h"
 
-typedef enum { UNINITIALIZED, READABLE, EMPTY } BufferStatus;
-
 #define BUFFER_MAX_SIZE 1024 * 1000
 #define BUFFERS_QUANTITY 2
 
+typedef enum { UNINITIALIZED, READABLE, EMPTY } BufferStatus;
+
 typedef struct {
   byte data[BUFFER_MAX_SIZE];
-  size_t size;
+  size_t size, consumedSize;
   BufferStatus status;
   pthread_mutex_t mutex;
   pthread_cond_t cond;

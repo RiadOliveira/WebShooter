@@ -33,20 +33,19 @@ inline void setContentMetadata(Metadata* metadata, const char* path) {
   const bool folder = S_ISDIR(stMode);
   if(!file && !folder) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
-  metadata->size = file ? pathStat.st_size : 0;
   metadata->mode = stMode;
   metadata->atime = pathStat.st_atime;
   metadata->mtime = pathStat.st_mtime;
+  if(file) metadata->size = pathStat.st_size;
 }
 
-inline void concatPathSeparatorToFolderName(char* name) {
-  const size_t length = strlen(name);
-  name[length] = PATH_SEPARATOR;
-  name[length + 1] = NULL_TERMINATOR;
+inline size_t getMetadataStructSize(Metadata* metadata) {
+  const bool file = isFile(metadata);
+  return file ? METADATA_SIZE : METADATA_SIZE_WITHOUT_SIZE_ATTRIBUTE;
 }
 
-inline bool isFolder(ContentData* data) { return data->metadata.size == 0; }
-inline bool isFile(ContentData* data) { return data->metadata.size > 0; }
+inline bool isFile(Metadata* metadata) { return S_ISREG(metadata->mode); }
+inline bool isFolder(Metadata* metadata) { return S_ISDIR(metadata->mode); }
 
 inline bool isEmptySubContent(char* subContentName) {
   char* currentChar = subContentName;

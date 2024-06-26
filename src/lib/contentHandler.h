@@ -9,6 +9,9 @@
 #include "fileManager.h"
 #include "shortcutTypes.h"
 
+#define METADATA_SIZE sizeof(Metadata)
+#define METADATA_SIZE_WITHOUT_SIZE_ATTRIBUTE (METADATA_SIZE - sizeof(size_t))
+
 typedef struct {
   char* name;
   Metadata metadata;
@@ -17,10 +20,10 @@ typedef struct {
 void fillContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);
 void setContentMetadata(Metadata* metadata, const char* path);
-void concatPathSeparatorToFolderName(char* name);
 
-bool isFolder(ContentData* data);
-bool isFile(ContentData* data);
+size_t getMetadataStructSize(Metadata* metadata);
+bool isFile(Metadata* metadata);
+bool isFolder(Metadata* metadata);
 bool isEmptySubContent(char* subContentName);
 
 #endif

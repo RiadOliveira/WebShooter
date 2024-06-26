@@ -19,16 +19,17 @@ void unwebArchiveIntoContents(WstParams* params) {
 
 void* handleArchiveReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
+  Buffer* buffers = parsedParams->buffers;
   FILE* archive = openFileOrExit(parsedParams->archivePath, READ_BINARY_MODE);
 
   uint bufferInd = 0;
   Buffer* currentBuffer;
   do {
-    currentBuffer = &parsedParams->buffers[bufferInd];
+    currentBuffer = &buffers[bufferInd];
     byte* currentData = currentBuffer->data;
     currentBuffer->size = fread(currentData, 1, BUFFER_MAX_SIZE, archive);
 
-    advanceBufferAndWaitForNext(parsedParams->buffers, &bufferInd);
+    advanceBufferAndWaitForNext(buffers, &bufferInd);
   } while(currentBuffer->size > 0);
 
   fclose(archive);
@@ -36,9 +37,14 @@ void* handleArchiveReading(void* params) {
 
 void* handleContentsWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
+  Buffer* buffers = parsedParams->buffers;
+
+  ContentData data;
+  char contentName[CONTENT_NAME_MAX_SIZE], fullPath[PATH_MAX_SIZE];
+  data.name = contentName;
 
   uint bufferInd = 0;
-  Buffer* currentBuffer = &parsedParams->buffers[bufferInd];
+  Buffer* currentBuffer = &buffers[bufferInd];
   do {
     waitBufferReachStatus(currentBuffer, READABLE);
   } while(currentBuffer->status != EMPTY);

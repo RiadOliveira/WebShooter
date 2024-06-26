@@ -24,7 +24,6 @@ void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, char*, size_t);
 
 void webFileIntoBuffer(ContentData*, Buffer*, const char*);
 
-void redirectContentToHandler(ContentData*, Buffer*, const char*, char*);
 uint parseBufferForWebbing(ContentData*, Buffer*);
 
 #endif
