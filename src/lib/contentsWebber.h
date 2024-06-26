@@ -21,9 +21,9 @@ void* handleArchiveWriting(void*);
 
 void webFolderIntoBuffer(ContentData*, Buffer*, char*, size_t);
 void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, char*, size_t);
-
 void webFileIntoBuffer(ContentData*, Buffer*, const char*);
-
 uint parseBufferForWebbing(ContentData*, Buffer*);
+
+void finishContentsReading(Buffer* buffers);
 
 #endif

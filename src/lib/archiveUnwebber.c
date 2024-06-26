@@ -26,8 +26,10 @@ void* handleArchiveReading(void* params) {
   Buffer* currentBuffer;
   do {
     currentBuffer = &buffers[bufferInd];
+
     byte* currentData = currentBuffer->data;
     currentBuffer->size = fread(currentData, 1, BUFFER_MAX_SIZE, archive);
+    currentBuffer->consumedSize = 0;
 
     advanceBufferAndWaitForNext(buffers, &bufferInd);
   } while(currentBuffer->size > 0);

@@ -37,9 +37,7 @@ void* handleContentsReading(void* params) {
     }
   }
 
-  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
-  advanceBufferAndWaitForNext(buffers, &bufferInd);
-  buffers[bufferInd].status = EMPTY;
+  finishContentsReading(buffers);
 }
 
 void* handleArchiveWriting(void* params) {
@@ -74,7 +72,7 @@ void webFolderIntoBuffer(
   );
 
   uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
-  bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
+  const bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
 
   Buffer* currentBuffer = &buffers[bufferInd];
@@ -135,7 +133,8 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   const size_t metadataSize = getMetadataStructSize(&data->metadata);
   const size_t sizeToAdd = nameSize + metadataSize;
 
-  bool reachesMaxSize = buffers[bufferInd].size + sizeToAdd >= BUFFER_MAX_SIZE;
+  const size_t currentSize = buffers[bufferInd].size;
+  const bool reachesMaxSize = currentSize + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
 
   Buffer* currentBuffer = &buffers[bufferInd];
@@ -146,4 +145,13 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   currentBuffer->size += sizeToAdd;
 
   return bufferInd;
+}
+
+inline void finishContentsReading(Buffer* buffers) {
+  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
+
+  const bool bufferHasData = buffers[bufferInd].size > 0;
+  if(bufferHasData) advanceBufferAndWaitForNext(buffers, &bufferInd);
+
+  buffers[bufferInd].status = EMPTY;
 }
