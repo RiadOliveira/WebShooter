@@ -21,6 +21,7 @@ typedef struct {
 void initializeBuffers(Buffer* buffers, size_t quantity);
 void finalizeBuffers(Buffer* buffers, size_t quantity);
 
+uint getFirstBufferWithStatus(Buffer* buffers, BufferStatus status);
 void advanceBufferAndWaitForNext(Buffer* buffers, uint* bufferInd);
 void waitBufferReachStatus(Buffer* buffer, BufferStatus status);
 

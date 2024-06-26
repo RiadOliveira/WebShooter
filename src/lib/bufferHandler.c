@@ -20,6 +20,12 @@ inline void finalizeBuffers(Buffer* buffers, size_t quantity) {
   }
 }
 
+inline uint getFirstBufferWithStatus(Buffer* buffers, BufferStatus status) {
+  uint bufferInd = 0;
+  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+  return bufferInd;
+}
+
 inline void advanceBufferAndWaitForNext(Buffer* buffers, uint* bufferInd) {
   Buffer* selectedBuffer = &buffers[*bufferInd];
   selectedBuffer->status = READABLE;

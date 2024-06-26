@@ -37,8 +37,7 @@ void* handleContentsReading(void* params) {
     }
   }
 
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
   advanceBufferAndWaitForNext(buffers, &bufferInd);
   buffers[bufferInd].status = EMPTY;
 }
@@ -74,9 +73,7 @@ void webFolderIntoBuffer(
     folder, buffers, fullPath, pathLength
   );
 
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
-
+  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
   bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
 
@@ -132,8 +129,7 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
 }
 
 uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
 
   const size_t nameSize = strlen(data->name) + 1;
   const size_t metadataSize = getMetadataStructSize(&data->metadata);
