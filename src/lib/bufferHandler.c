@@ -20,7 +20,9 @@ inline void finalizeBuffers(Buffer* buffers, size_t quantity) {
   }
 }
 
-inline uint getFirstBufferWithStatus(Buffer* buffers, BufferStatus status) {
+inline uint getIndOfFirstBufferWithStatus(
+  Buffer* buffers, BufferStatus status
+) {
   uint bufferInd = 0;
   while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
   return bufferInd;
@@ -43,4 +45,11 @@ inline void waitBufferReachStatus(Buffer* buffer, BufferStatus status) {
   pthread_mutex_lock(mutex);
   while(buffer->status != status) pthread_cond_wait(&buffer->cond, mutex);
   pthread_mutex_unlock(mutex);
+}
+
+inline void finishBuffersReading(Buffer* buffers, uint bufferInd) {
+  const bool bufferHasData = buffers[bufferInd].size > 0;
+  if(bufferHasData) advanceBufferAndWaitForNext(buffers, &bufferInd);
+
+  buffers[bufferInd].status = EMPTY;
 }

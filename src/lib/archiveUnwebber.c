@@ -23,17 +23,20 @@ void* handleArchiveReading(void* params) {
   FILE* archive = openFileOrExit(parsedParams->archivePath, READ_BINARY_MODE);
 
   uint bufferInd = 0;
-  Buffer* currentBuffer;
+  bool hasMoreBytesToRead;
   do {
-    currentBuffer = &buffers[bufferInd];
+    Buffer* currentBuffer = &buffers[bufferInd];
 
     byte* currentData = currentBuffer->data;
     currentBuffer->size = fread(currentData, 1, BUFFER_MAX_SIZE, archive);
     currentBuffer->consumedSize = 0;
 
-    advanceBufferAndWaitForNext(buffers, &bufferInd);
-  } while(currentBuffer->size > 0);
+    if(hasMoreBytesToRead = (currentBuffer->size > 0)) {
+      advanceBufferAndWaitForNext(buffers, &bufferInd);
+    }
+  } while(hasMoreBytesToRead);
 
+  finishBuffersReading(buffers, bufferInd);
   fclose(archive);
 }
 

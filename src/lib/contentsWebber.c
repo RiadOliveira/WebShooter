@@ -37,7 +37,8 @@ void* handleContentsReading(void* params) {
     }
   }
 
-  finishContentsReading(buffers);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
+  finishBuffersReading(buffers, bufferInd);
 }
 
 void* handleArchiveWriting(void* params) {
@@ -71,7 +72,7 @@ void webFolderIntoBuffer(
     folder, buffers, fullPath, pathLength
   );
 
-  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
   const bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) advanceBufferAndWaitForNext(buffers, &bufferInd);
 
@@ -106,10 +107,10 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
   FILE* content = openFileOrExit(path, READ_BINARY_MODE);
 
   uint bufferInd = parseBufferForWebbing(data, buffers);
-  Buffer* currentBuffer = &buffers[bufferInd];
-
   bool hasMoreBytesToRead;
   do {
+    Buffer* currentBuffer = &buffers[bufferInd];
+
     const size_t currentSize = currentBuffer->size;
     const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
 
@@ -119,7 +120,6 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
 
     if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
       advanceBufferAndWaitForNext(buffers, &bufferInd);
-      currentBuffer = &buffers[bufferInd];
     }
   } while(hasMoreBytesToRead);
 
@@ -127,7 +127,7 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
 }
 
 uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
-  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
 
   const size_t nameSize = strlen(data->name) + 1;
   const size_t metadataSize = getMetadataStructSize(&data->metadata);
@@ -145,13 +145,4 @@ uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
   currentBuffer->size += sizeToAdd;
 
   return bufferInd;
-}
-
-inline void finishContentsReading(Buffer* buffers) {
-  uint bufferInd = getFirstBufferWithStatus(buffers, UNINITIALIZED);
-
-  const bool bufferHasData = buffers[bufferInd].size > 0;
-  if(bufferHasData) advanceBufferAndWaitForNext(buffers, &bufferInd);
-
-  buffers[bufferInd].status = EMPTY;
 }
