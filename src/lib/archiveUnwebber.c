@@ -49,12 +49,34 @@ void* handleContentsWriting(void* params) {
   data.name = contentName;
 
   uint bufferInd = 0;
-  Buffer* currentBuffer = &buffers[bufferInd];
+  waitForBufferStatusMismatch(&buffers[bufferInd], UNSET);
   do {
     getContentDataFromBuffers(&data, buffers, &bufferInd);
-  } while(currentBuffer->status != EMPTY);
+  } while(buffers[bufferInd].status != FINISHED);
 }
 
-void getContentDataFromBuffers(
+inline void getContentDataFromBuffers(
   ContentData* data, Buffer* buffers, uint* bufferInd
-) {}
+) {
+  getContentNameFromBuffers(data->name, buffers, bufferInd);
+  getContentMetadataFromBuffers(&data->metadata, buffers, bufferInd);
+}
+
+inline void getContentNameFromBuffers(
+  char* name, Buffer* buffers, uint* bufferInd
+) {
+  uint nameInd = 0;
+  do consumeBuffersBytes(&name[nameInd], buffers, bufferInd, 1);
+  while(name[nameInd++] != NULL_TERMINATOR);
+}
+
+inline void getContentMetadataFromBuffers(
+  Metadata* metadata, Buffer* buffers, uint* bufferInd
+) {
+  byte* metadataBytes = (byte*)metadata;
+  consumeBuffersBytes(metadataBytes, buffers, bufferInd, METADATA_MODE_SIZE);
+  metadataBytes += METADATA_MODE_SIZE;
+
+  const size_t sizeLeft = getMetadataStructSize(metadata) - METADATA_MODE_SIZE;
+  consumeBuffersBytes(metadataBytes, buffers, bufferInd, sizeLeft);
+}

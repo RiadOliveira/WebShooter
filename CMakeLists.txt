@@ -33,7 +33,6 @@ set(SOURCES
   src/lib/fileManager.c
 
   src/utils/errorThrower.c
-  src/utils/mathUtils.c
 )
 
 list(REMOVE_ITEM SOURCES ${MAIN_FILE})

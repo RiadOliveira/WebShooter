@@ -1,6 +1,7 @@
 #ifndef MATH_UTILS_H_
 #define MATH_UTILS_H_
 
-int max(int first, int second);
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #endif

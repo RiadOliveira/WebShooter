@@ -37,7 +37,7 @@ void* handleContentsReading(void* params) {
     }
   }
 
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
   finishBuffersReading(buffers, &bufferInd);
 }
 
@@ -48,15 +48,15 @@ void* handleArchiveWriting(void* params) {
 
   uint bufferInd = 0;
   Buffer* currentBuffer = &buffers[bufferInd];
-  waitForBufferStatusMismatch(currentBuffer, UNINITIALIZED);
+  waitForBufferStatusMismatch(currentBuffer, UNSET);
 
   do {
     fwrite(currentBuffer->data, 1, currentBuffer->size, archive);
     currentBuffer->size = 0;
 
-    setBufferStatusAndWaitForNext(UNINITIALIZED, buffers, &bufferInd);
+    setBufferStatusAndWaitForNext(UNSET, buffers, &bufferInd);
     currentBuffer = &buffers[bufferInd];
-  } while(currentBuffer->status != EMPTY);
+  } while(currentBuffer->status != FINISHED);
 
   fclose(archive);
 }
@@ -71,7 +71,7 @@ void webFolderIntoBuffer(
     folder, buffers, fullPath, pathLength
   );
 
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
   const bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
     setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
@@ -128,7 +128,7 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
 }
 
 uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNINITIALIZED);
+  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
 
   const size_t nameSize = strlen(data->name) + 1;
   const size_t metadataSize = getMetadataStructSize(&data->metadata);

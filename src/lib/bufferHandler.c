@@ -5,7 +5,7 @@ inline void initializeBuffers(Buffer* buffers, size_t quantity) {
     Buffer* currentBuffer = &buffers[ind];
 
     currentBuffer->size = currentBuffer->consumedSize = 0;
-    currentBuffer->status = UNINITIALIZED;
+    currentBuffer->status = UNSET;
     pthread_mutex_init(&currentBuffer->mutex, NULL);
     pthread_cond_init(&currentBuffer->cond, NULL);
   }
@@ -20,11 +20,33 @@ inline void finalizeBuffers(Buffer* buffers, size_t quantity) {
   }
 }
 
+void consumeBuffersBytes(
+  byte* dest, Buffer* buffers, uint* bufferInd, size_t bytesQuantity
+) {
+  Buffer* currentBuffer = &buffers[*bufferInd];
+  const size_t consumedSize = currentBuffer->consumedSize;
+  const size_t maxSizeConsumable = currentBuffer->size - consumedSize;
+
+  size_t quantityToConsume = min(bytesQuantity, maxSizeConsumable);
+  memcpy(dest, &currentBuffer->data[consumedSize], quantityToConsume);
+
+  const bool bufferFullyConsumed = quantityToConsume == maxSizeConsumable;
+  if(bufferFullyConsumed) {
+    setBufferStatusAndWaitForNext(UNSET, buffers, bufferInd);
+
+    currentBuffer = &buffers[*bufferInd];
+    quantityToConsume = bytesQuantity - maxSizeConsumable;
+    memcpy(&dest[maxSizeConsumable], currentBuffer->data, quantityToConsume);
+  }
+
+  currentBuffer->consumedSize += quantityToConsume;
+}
+
 inline uint getIndOfFirstBufferWithStatus(
   Buffer* buffers, BufferStatus status
 ) {
   uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNINITIALIZED) bufferInd++;
+  while(buffers[bufferInd].status != UNSET) bufferInd++;
   return bufferInd;
 }
 
@@ -53,5 +75,5 @@ inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
     setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
   }
 
-  buffers[*bufferInd].status = EMPTY;
+  buffers[*bufferInd].status = FINISHED;
 }

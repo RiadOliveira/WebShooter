@@ -16,6 +16,10 @@
 #define READ_BINARY_MODE "rb"
 #define WRITE_BINARY_MODE "wb"
 
+#define METADATA_SIZE sizeof(Metadata)
+#define METADATA_MODE_SIZE sizeof(uint)
+#define METADATA_SIZE_WITHOUT_SIZE_ATTRIBUTE (METADATA_SIZE - sizeof(size_t))
+
 typedef struct {
   uint mode;
   long atime, mtime;

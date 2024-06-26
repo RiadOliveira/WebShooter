@@ -9,9 +9,6 @@
 #include "fileManager.h"
 #include "shortcutTypes.h"
 
-#define METADATA_SIZE sizeof(Metadata)
-#define METADATA_SIZE_WITHOUT_SIZE_ATTRIBUTE (METADATA_SIZE - sizeof(size_t))
-
 typedef struct {
   char* name;
   Metadata metadata;

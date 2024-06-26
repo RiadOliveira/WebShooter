@@ -19,5 +19,7 @@ void* handleArchiveReading(void*);
 void* handleContentsWriting(void*);
 
 void getContentDataFromBuffers(ContentData*, Buffer*, uint*);
+void getContentNameFromBuffers(char*, Buffer*, uint*);
+void getContentMetadataFromBuffers(Metadata*, Buffer*, uint*);
 
 #endif
