@@ -32,11 +32,11 @@ void* handleArchiveReading(void* params) {
     currentBuffer->consumedSize = 0;
 
     if(hasMoreBytesToRead = (currentBuffer->size > 0)) {
-      advanceBufferAndWaitForNext(buffers, &bufferInd);
+      setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
     }
   } while(hasMoreBytesToRead);
 
-  finishBuffersReading(buffers, bufferInd);
+  finishBuffersReading(buffers, &bufferInd);
   fclose(archive);
 }
 
@@ -51,6 +51,10 @@ void* handleContentsWriting(void* params) {
   uint bufferInd = 0;
   Buffer* currentBuffer = &buffers[bufferInd];
   do {
-    waitBufferReachStatus(currentBuffer, READABLE);
+    getContentDataFromBuffers(&data, buffers, &bufferInd);
   } while(currentBuffer->status != EMPTY);
 }
+
+void getContentDataFromBuffers(
+  ContentData* data, Buffer* buffers, uint* bufferInd
+) {}

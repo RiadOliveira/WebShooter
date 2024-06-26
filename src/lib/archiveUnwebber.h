@@ -18,4 +18,6 @@ typedef struct {
 void* handleArchiveReading(void*);
 void* handleContentsWriting(void*);
 
+void getContentDataFromBuffers(ContentData*, Buffer*, uint*);
+
 #endif

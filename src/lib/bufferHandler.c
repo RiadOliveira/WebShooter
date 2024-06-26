@@ -28,28 +28,30 @@ inline uint getIndOfFirstBufferWithStatus(
   return bufferInd;
 }
 
-inline void advanceBufferAndWaitForNext(Buffer* buffers, uint* bufferInd) {
+inline void setBufferStatusAndWaitForNext(
+  BufferStatus status, Buffer* buffers, uint* bufferInd
+) {
   Buffer* selectedBuffer = &buffers[*bufferInd];
-  selectedBuffer->status = READABLE;
+  selectedBuffer->status = status;
   pthread_cond_signal(&selectedBuffer->cond);
 
   if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
-  selectedBuffer = &buffers[*bufferInd];
-
-  waitBufferReachStatus(selectedBuffer, UNINITIALIZED);
+  waitForBufferStatusMismatch(&buffers[*bufferInd], status);
 }
 
-inline void waitBufferReachStatus(Buffer* buffer, BufferStatus status) {
+inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {
   pthread_mutex_t* mutex = &buffer->mutex;
 
   pthread_mutex_lock(mutex);
-  while(buffer->status != status) pthread_cond_wait(&buffer->cond, mutex);
+  while(buffer->status == status) pthread_cond_wait(&buffer->cond, mutex);
   pthread_mutex_unlock(mutex);
 }
 
-inline void finishBuffersReading(Buffer* buffers, uint bufferInd) {
-  const bool bufferHasData = buffers[bufferInd].size > 0;
-  if(bufferHasData) advanceBufferAndWaitForNext(buffers, &bufferInd);
+inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
+  const bool currentBufferHasData = buffers[*bufferInd].size > 0;
+  if(currentBufferHasData) {
+    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
+  }
 
-  buffers[bufferInd].status = EMPTY;
+  buffers[*bufferInd].status = EMPTY;
 }

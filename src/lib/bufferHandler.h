@@ -22,8 +22,10 @@ void initializeBuffers(Buffer* buffers, size_t quantity);
 void finalizeBuffers(Buffer* buffers, size_t quantity);
 
 uint getIndOfFirstBufferWithStatus(Buffer* buffers, BufferStatus status);
-void advanceBufferAndWaitForNext(Buffer* buffers, uint* bufferInd);
-void waitBufferReachStatus(Buffer* buffer, BufferStatus status);
-void finishBuffersReading(Buffer* buffers, uint bufferInd);
+void setBufferStatusAndWaitForNext(
+  BufferStatus status, Buffer* buffers, uint* bufferInd
+);
+void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status);
+void finishBuffersReading(Buffer* buffers, uint* bufferInd);
 
 #endif
