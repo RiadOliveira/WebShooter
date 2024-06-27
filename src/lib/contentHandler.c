@@ -5,7 +5,7 @@ const char* LOCATING_ERROR_MESSAGE =
 
 inline void fillContentData(ContentData* data, const char* path) {
   getContentName(data->name, path);
-  setContentMetadata(&data->metadata, path);
+  getContentMetadata(&data->metadata, path);
 }
 
 inline void getContentName(char* name, const char* path) {
@@ -24,7 +24,7 @@ inline void getContentName(char* name, const char* path) {
   }
 }
 
-inline void setContentMetadata(Metadata* metadata, const char* path) {
+inline void getContentMetadata(Metadata* metadata, const char* path) {
   struct stat pathStat;
   if(stat(path, &pathStat) != 0) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
@@ -34,6 +34,8 @@ inline void setContentMetadata(Metadata* metadata, const char* path) {
   if(!file && !folder) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
 
   metadata->mode = stMode;
+  metadata->uid = pathStat.st_uid;
+  metadata->gid = pathStat.st_gid;
   metadata->atime = pathStat.st_atime;
   metadata->mtime = pathStat.st_mtime;
   if(file) metadata->size = pathStat.st_size;

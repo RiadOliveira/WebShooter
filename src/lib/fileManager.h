@@ -5,14 +5,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <utime.h>
 
 #include "constants.h"
 #include "errorThrower.h"
 #include "shortcutTypes.h"
-
-#if defined(_WIN32) || defined(_WIN64)
-  #define stat _stat
-#endif
 
 #define READ_BINARY_MODE "rb"
 #define WRITE_BINARY_MODE "wb"
@@ -23,6 +21,7 @@
 
 typedef struct {
   uint mode;
+  uint uid, gid;
   long atime, mtime;
   size_t size;
 } Metadata;
@@ -30,6 +29,7 @@ typedef struct {
 FILE* openFileOrExit(const char* path, const char* modes);
 DIR* openFolderOrExit(const char* path);
 
+void setFileOrFolderMetadata(const char* path, Metadata* metadata);
 void createFolder(const char* path);
 void appendPath(char* destination, unsigned int position, const char* source);
 

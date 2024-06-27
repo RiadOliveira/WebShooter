@@ -3,7 +3,7 @@
 inline FILE* openFileOrExit(const char* path, const char* modes) {
   FILE* file = fopen(path, modes);
   if(file == NULL || *path == PATH_SEPARATOR) {
-    exitWithMessage("Error opening the file indicated by the path: %s", path);
+    exitWithMessage("Error opening the following file: %s", path);
   }
 
   return file;
@@ -12,10 +12,21 @@ inline FILE* openFileOrExit(const char* path, const char* modes) {
 inline DIR* openFolderOrExit(const char* path) {
   DIR* folder = opendir(path);
   if(folder == NULL || *path == PATH_SEPARATOR) {
-    exitWithMessage("Error opening the folder indicated by the path: %s", path);
+    exitWithMessage("Error opening the following folder: %s", path);
   }
 
   return folder;
+}
+
+void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
+  struct utimbuf timesData = {metadata->atime, metadata->mtime};
+
+  bool successfullySet = chmod(path, metadata->mode) != -1;
+  successfullySet &= chown(path, metadata->uid, metadata->gid) != -1;
+  successfullySet &= utime(path, &timesData) != -1;
+
+  if(successfullySet) return;
+  exitWithMessage("Error setting following content metadata: %s", path);
 }
 
 inline void createFolder(const char* path) {

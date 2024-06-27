@@ -16,7 +16,7 @@ typedef struct {
 
 void fillContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);
-void setContentMetadata(Metadata* metadata, const char* path);
+void getContentMetadata(Metadata* metadata, const char* path);
 
 size_t getMetadataStructSize(Metadata* metadata);
 bool isFile(Metadata* metadata);

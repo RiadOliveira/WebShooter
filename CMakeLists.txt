@@ -16,6 +16,7 @@ set(HEADERS
   src/lib/contentsWebber.h
   src/lib/fileManager.h
   src/lib/libwst.h
+  src/lib/operationTypes.h
 
   src/utils/errorThrower.h
   src/utils/mathUtils.h

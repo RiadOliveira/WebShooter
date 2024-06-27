@@ -12,7 +12,6 @@ void unwebArchiveIntoContents(WstParams* params) {
   WriteThreadParams writingParams = {*params->contentPaths, buffers};
   pthread_create(&writingThread, NULL, handleContentsWriting, &writingParams);
 
-  pthread_join(readThread, NULL);  // This will be removed after writing impl.
   pthread_join(writingThread, NULL);
   finalizeBuffers(buffers, BUFFERS_QUANTITY);
 }
@@ -32,7 +31,7 @@ void* handleArchiveReading(void* params) {
     currentBuffer->consumedSize = 0;
 
     if(hasMoreBytesToRead = (currentBuffer->size > 0)) {
-      setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
+      setBufferStatusAndWaitForNext(CONSUMABLE, buffers, &bufferInd);
     }
   } while(hasMoreBytesToRead);
 
@@ -42,26 +41,28 @@ void* handleArchiveReading(void* params) {
 
 void* handleContentsWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
-  UnwebbingData data = {parsedParams->buffers, 0};
-  Metadata* metadata = &data.contentData.metadata;
+  const size_t basePathLength = strlen(parsedParams->contentsPath);
+
+  WebbingOperationData data = {parsedParams->buffers, 0};
+  strcpy(data.fullPath, parsedParams->contentsPath);
 
   Buffer* buffers = data.buffers;
   uint* bufferInd = &data.bufferInd;
   waitForBufferStatusMismatch(&buffers[*bufferInd], UNSET);
+
   do {
     getContentDataFromBuffers(&data);
-
-    if(isFolder(metadata)) unwebFolderFromBuffers(&data);
-    else unwebFileFromBuffers(&data);
+    appendPath(data.fullPath, basePathLength, data.contentData.name);
+    unwebContent(&data);
   } while(buffers[*bufferInd].status != FINISHED);
 }
 
-inline void getContentDataFromBuffers(UnwebbingData* data) {
+inline void getContentDataFromBuffers(WebbingOperationData* data) {
   getContentNameFromBuffers(data);
   getContentMetadataFromBuffers(data);
 }
 
-inline void getContentNameFromBuffers(UnwebbingData* data) {
+inline void getContentNameFromBuffers(WebbingOperationData* data) {
   char* name = data->contentData.name;
   uint nameInd = 0;
 
@@ -69,7 +70,7 @@ inline void getContentNameFromBuffers(UnwebbingData* data) {
   while(name[nameInd++] != NULL_TERMINATOR);
 }
 
-inline void getContentMetadataFromBuffers(UnwebbingData* data) {
+inline void getContentMetadataFromBuffers(WebbingOperationData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
@@ -83,6 +84,36 @@ inline void getContentMetadataFromBuffers(UnwebbingData* data) {
   consumeBuffersBytes(metadataBytes, buffers, bufferInd, sizeLeft);
 }
 
-void unwebFolderFromBuffers(UnwebbingData* data) {}
+void unwebFolderFromBuffers(WebbingOperationData* data) {}
 
-void unwebFileFromBuffers(UnwebbingData* data) {}
+void unwebFileFromBuffers(WebbingOperationData* data) {
+  FILE* file = openFileOrExit(data->fullPath, WRITE_BINARY_MODE);
+
+  const size_t fileSize = data->contentData.metadata.size;
+  size_t bytesWritten = 0;
+  do {
+    Buffer* currentBuffer = &data->buffers[data->bufferInd];
+    size_t* consumedSize = &currentBuffer->consumedSize;
+
+    const size_t remainingBufferSize = currentBuffer->size - *consumedSize;
+    const size_t remainingFileSize = fileSize - bytesWritten;
+    const size_t sizeToConsume = min(remainingBufferSize, remainingFileSize);
+
+    byte* currentData = &currentBuffer->data[*consumedSize];
+    *consumedSize += fwrite(currentData, 1, sizeToConsume, file);
+    bytesWritten += sizeToConsume;
+
+    if(sizeToConsume == remainingBufferSize) {
+      setBufferStatusAndWaitForNext(UNSET, data->buffers, &data->bufferInd);
+    }
+  } while(bytesWritten < fileSize);
+
+  fclose(file);
+}
+
+inline void unwebContent(WebbingOperationData* data) {
+  const bool folder = isFolder(&data->contentData.metadata);
+  (folder ? unwebFolderFromBuffers : unwebFileFromBuffers)(data);
+
+  setFileOrFolderMetadata(data->fullPath, &data->contentData.metadata);
+}

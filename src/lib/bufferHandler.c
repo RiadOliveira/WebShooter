@@ -64,7 +64,7 @@ inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {
 inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
   const bool currentBufferHasData = buffers[*bufferInd].size > 0;
   if(currentBufferHasData) {
-    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
   }
 
   buffers[*bufferInd].status = FINISHED;

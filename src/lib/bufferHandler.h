@@ -10,7 +10,7 @@
 #define BUFFER_MAX_SIZE 1024 * 1000
 #define BUFFERS_QUANTITY 2
 
-typedef enum { UNSET, READABLE, FINISHED } BufferStatus;
+typedef enum { UNSET, CONSUMABLE, FINISHED } BufferStatus;
 
 typedef struct {
   byte data[BUFFER_MAX_SIZE];

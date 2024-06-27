@@ -1,9 +1,8 @@
 #ifndef CONTENTS_WEBBER_H
 #define CONTENTS_WEBBER_H
 
-#include "bufferHandler.h"
-#include "contentHandler.h"
 #include "libwst.h"
+#include "operationTypes.h"
 
 typedef struct {
   const char** contentPaths;
@@ -16,21 +15,14 @@ typedef struct {
   Buffer* buffers;
 } WriteThreadParams;
 
-typedef struct {
-  Buffer* buffers;
-  uint bufferInd;
-  ContentData contentData;
-  char fullPath[PATH_MAX_SIZE];
-} WebbingData;
-
 void* handleContentsReading(void*);
 void* handleArchiveWriting(void*);
 
-void webFolderIntoBuffers(WebbingData*);
-void webFolderSubContentsIntoBuffers(DIR*, WebbingData*);
-void webFileIntoBuffers(WebbingData*);
+void webFolderIntoBuffers(WebbingOperationData*);
+void webFolderSubContentsIntoBuffers(DIR*, WebbingOperationData*);
+void webFileIntoBuffers(WebbingOperationData*);
 
-void redirectContentToHandler(WebbingData*);
-void parseBuffersForWebbing(WebbingData*);
+void webContent(WebbingOperationData*);
+void parseBuffersForWebbing(WebbingOperationData*);
 
 #endif

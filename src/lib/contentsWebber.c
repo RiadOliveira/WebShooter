@@ -20,12 +20,12 @@ void webContentsIntoArchive(WstParams* params) {
 
 void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
-  WebbingData data = {parsedParams->buffers, 0};
+  WebbingOperationData data = {parsedParams->buffers, 0};
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     strcpy(data.fullPath, parsedParams->contentPaths[ind]);
     fillContentData(&data.contentData, data.fullPath);
-    redirectContentToHandler(&data);
+    webContent(&data);
   }
 
   finishBuffersReading(data.buffers, &data.bufferInd);
@@ -51,7 +51,7 @@ void* handleArchiveWriting(void* params) {
   fclose(archive);
 }
 
-void webFolderIntoBuffers(WebbingData* data) {
+void webFolderIntoBuffers(WebbingOperationData* data) {
   DIR* folder = openFolderOrExit(data->fullPath);
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
@@ -61,7 +61,7 @@ void webFolderIntoBuffers(WebbingData* data) {
 
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
-    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
@@ -70,7 +70,7 @@ void webFolderIntoBuffers(WebbingData* data) {
   closedir(folder);
 }
 
-void webFolderSubContentsIntoBuffers(DIR* folder, WebbingData* data) {
+void webFolderSubContentsIntoBuffers(DIR* folder, WebbingOperationData* data) {
   char* fullPath = data->fullPath;
   const size_t pathLength = strlen(fullPath);
   ContentData* contentData = &data->contentData;
@@ -81,14 +81,14 @@ void webFolderSubContentsIntoBuffers(DIR* folder, WebbingData* data) {
 
     appendPath(fullPath, pathLength, subContentDirent->d_name);
     strcpy(contentData->name, subContentDirent->d_name);
-    setContentMetadata(&contentData->metadata, fullPath);
+    getContentMetadata(&contentData->metadata, fullPath);
 
-    redirectContentToHandler(data);
+    webContent(data);
   }
 }
 
-void webFileIntoBuffers(WebbingData* data) {
-  FILE* content = openFileOrExit(data->fullPath, READ_BINARY_MODE);
+void webFileIntoBuffers(WebbingOperationData* data) {
+  FILE* file = openFileOrExit(data->fullPath, READ_BINARY_MODE);
   parseBuffersForWebbing(data);
 
   Buffer* buffers = data->buffers;
@@ -96,34 +96,34 @@ void webFileIntoBuffers(WebbingData* data) {
   bool hasMoreBytesToRead;
   do {
     Buffer* currentBuffer = &buffers[*bufferInd];
-
     const size_t currentSize = currentBuffer->size;
     const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
 
     byte* currentData = &currentBuffer->data[currentSize];
-    const size_t bytesRead = fread(currentData, 1, maxSizeReadable, content);
+    const size_t bytesRead = fread(currentData, 1, maxSizeReadable, file);
     currentBuffer->size += bytesRead;
 
     if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
-      setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
+      setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
     }
   } while(hasMoreBytesToRead);
 
-  fclose(content);
+  fclose(file);
 }
 
-inline void redirectContentToHandler(WebbingData* data) {
+inline void webContent(WebbingOperationData* data) {
   const bool folder = isFolder(&data->contentData.metadata);
   (folder ? webFolderIntoBuffers : webFileIntoBuffers)(data);
 }
 
-void parseBuffersForWebbing(WebbingData* data) {
+void parseBuffersForWebbing(WebbingOperationData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
-  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
+  waitForBufferStatusMismatch(&buffers[*bufferInd], CONSUMABLE);
 
   char* name = data->contentData.name;
   Metadata* metadata = &data->contentData.metadata;
+
   const size_t nameSize = strlen(name) + 1;
   const size_t metadataSize = getMetadataStructSize(metadata);
   const size_t sizeToAdd = nameSize + metadataSize;
@@ -131,7 +131,7 @@ void parseBuffersForWebbing(WebbingData* data) {
   const size_t currentSize = buffers[*bufferInd].size;
   const bool reachesMaxSize = currentSize + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) {
-    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
