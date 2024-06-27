@@ -58,7 +58,6 @@ void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
-  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
   parseBuffersForWebbing(data);
   webFolderSubContentsIntoBuffers(folder, data, pathLength);
 
@@ -97,12 +96,10 @@ void webFolderSubContentsIntoBuffers(
 
 void webFileIntoBuffers(WebbingData* data) {
   FILE* content = openFileOrExit(data->fullPath, READ_BINARY_MODE);
-  Buffer* buffers = data->buffers;
-  uint* bufferInd = &data->bufferInd;
-
-  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
   parseBuffersForWebbing(data);
 
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
   bool hasMoreBytesToRead;
   do {
     Buffer* currentBuffer = &buffers[*bufferInd];
@@ -125,6 +122,7 @@ void webFileIntoBuffers(WebbingData* data) {
 void parseBuffersForWebbing(WebbingData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
+  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
 
   char* name = data->contentData.name;
   Metadata* metadata = &data->contentData.metadata;

@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include "errorThrower.h"
+#include "shortcutTypes.h"
 
 #if defined(_WIN32) || defined(_WIN64)
   #define stat _stat
