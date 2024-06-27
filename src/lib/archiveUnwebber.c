@@ -45,9 +45,6 @@ void* handleContentsWriting(void* params) {
   Buffer* buffers = parsedParams->buffers;
 
   ContentData data;
-  char contentName[CONTENT_NAME_MAX_SIZE], fullPath[PATH_MAX_SIZE];
-  data.name = contentName;
-
   uint bufferInd = 0;
   waitForBufferStatusMismatch(&buffers[bufferInd], UNSET);
   do {

@@ -42,12 +42,12 @@ void consumeBuffersBytes(
   currentBuffer->consumedSize += quantityToConsume;
 }
 
-inline uint getIndOfFirstBufferWithStatus(
-  Buffer* buffers, BufferStatus status
+inline void getIndOfFirstBufferWithStatus(
+  Buffer* buffers, uint* bufferInd, BufferStatus status
 ) {
-  uint bufferInd = 0;
-  while(buffers[bufferInd].status != UNSET) bufferInd++;
-  return bufferInd;
+  pthread_mutex_lock(&buffers[*bufferInd].mutex);
+  while(buffers[*bufferInd].status != status) (*bufferInd)++;
+  pthread_mutex_unlock(&buffers[*bufferInd].mutex);
 }
 
 inline void setBufferStatusAndWaitForNext(

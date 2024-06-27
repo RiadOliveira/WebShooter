@@ -10,7 +10,7 @@
 #include "shortcutTypes.h"
 
 typedef struct {
-  char* name;
+  char name[CONTENT_NAME_MAX_SIZE];
   Metadata metadata;
 } ContentData;
 

@@ -19,6 +19,8 @@
     "random": "c",
     "stdlib.h": "c",
     "mathutils.h": "c",
-    "pthread.h": "c"
+    "pthread.h": "c",
+    "initializer_list": "c",
+    "utility": "c"
   }
 }

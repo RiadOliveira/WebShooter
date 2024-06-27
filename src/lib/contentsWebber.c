@@ -20,25 +20,17 @@ void webContentsIntoArchive(WstParams* params) {
 
 void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
-  Buffer* buffers = parsedParams->buffers;
-
-  ContentData data;
-  char contentName[CONTENT_NAME_MAX_SIZE], fullPath[PATH_MAX_SIZE];
-  data.name = contentName;
+  WebbingData data = {parsedParams->buffers, 0};
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
-    const char* path = parsedParams->contentPaths[ind];
-    fillContentData(&data, path);
+    strcpy(data.fullPath, parsedParams->contentPaths[ind]);
+    fillContentData(&data.contentData, data.fullPath);
 
-    if(isFile(&data.metadata)) webFileIntoBuffer(&data, buffers, path);
-    else {
-      strcpy(fullPath, path);
-      webFolderIntoBuffer(&data, buffers, fullPath, strlen(path));
-    }
+    if(isFile(&data.contentData.metadata)) webFileIntoBuffers(&data);
+    else webFolderIntoBuffers(&data, strlen(data.fullPath));
   }
 
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
-  finishBuffersReading(buffers, &bufferInd);
+  finishBuffersReading(data.buffers, &data.bufferInd);
 }
 
 void* handleArchiveWriting(void* params) {
@@ -61,56 +53,57 @@ void* handleArchiveWriting(void* params) {
   fclose(archive);
 }
 
-void webFolderIntoBuffer(
-  ContentData* data, Buffer* buffers, char* fullPath, size_t pathLength
-) {
-  DIR* folder = openFolderOrExit(fullPath);
+void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
+  DIR* folder = openFolderOrExit(data->fullPath);
+  parseBuffersForWebbing(data);
+  webFolderSubContentsIntoBuffers(folder, data, pathLength);
 
-  parseBufferForWebbing(data, buffers);
-  handleFolderSubContentsReadingIntoBuffer(
-    folder, buffers, fullPath, pathLength
-  );
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
 
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
-  const bool reachedMaxSize = buffers[bufferInd].size == BUFFER_MAX_SIZE;
+  getIndOfFirstBufferWithStatus(buffers, bufferInd, UNSET);
+  const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
-    setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
+    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
   }
 
-  Buffer* currentBuffer = &buffers[bufferInd];
+  Buffer* currentBuffer = &buffers[*bufferInd];
   currentBuffer->data[currentBuffer->size++] = PATH_SEPARATOR;
 
   closedir(folder);
 }
 
-void handleFolderSubContentsReadingIntoBuffer(
-  DIR* folder, Buffer* buffers, char* fullPath, size_t pathLength
+void webFolderSubContentsIntoBuffers(
+  DIR* folder, WebbingData* data, size_t pathLength
 ) {
-  ContentData data;
+  char* fullPath = data->fullPath;
+  ContentData* contentData = &data->contentData;
   struct dirent* subContentDirent;
 
   while((subContentDirent = readdir(folder)) != NULL) {
     if(isEmptySubContent(subContentDirent->d_name)) continue;
+
     appendPath(fullPath, pathLength, subContentDirent->d_name);
+    strcpy(contentData->name, subContentDirent->d_name);
+    setContentMetadata(&contentData->metadata, fullPath);
 
-    data.name = subContentDirent->d_name;
-    setContentMetadata(&data.metadata, fullPath);
-
-    if(isFile(&data.metadata)) webFileIntoBuffer(&data, buffers, fullPath);
+    if(isFile(&contentData->metadata)) webFileIntoBuffers(data);
     else {
       const size_t fullLength = pathLength + strlen(&fullPath[pathLength]);
-      webFolderIntoBuffer(&data, buffers, fullPath, fullLength);
+      webFolderIntoBuffers(data, fullLength);
     }
   }
 }
 
-void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
-  FILE* content = openFileOrExit(path, READ_BINARY_MODE);
+void webFileIntoBuffers(WebbingData* data) {
+  FILE* content = openFileOrExit(data->fullPath, READ_BINARY_MODE);
+  parseBuffersForWebbing(data);
 
-  uint bufferInd = parseBufferForWebbing(data, buffers);
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
   bool hasMoreBytesToRead;
   do {
-    Buffer* currentBuffer = &buffers[bufferInd];
+    Buffer* currentBuffer = &buffers[*bufferInd];
 
     const size_t currentSize = currentBuffer->size;
     const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
@@ -120,32 +113,34 @@ void webFileIntoBuffer(ContentData* data, Buffer* buffers, const char* path) {
     currentBuffer->size += bytesRead;
 
     if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
-      setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
+      setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
     }
   } while(hasMoreBytesToRead);
 
   fclose(content);
 }
 
-uint parseBufferForWebbing(ContentData* data, Buffer* buffers) {
-  uint bufferInd = getIndOfFirstBufferWithStatus(buffers, UNSET);
+void parseBuffersForWebbing(WebbingData* data) {
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
+  getIndOfFirstBufferWithStatus(buffers, bufferInd, UNSET);
 
-  const size_t nameSize = strlen(data->name) + 1;
-  const size_t metadataSize = getMetadataStructSize(&data->metadata);
+  char* name = data->contentData.name;
+  Metadata* metadata = &data->contentData.metadata;
+  const size_t nameSize = strlen(name) + 1;
+  const size_t metadataSize = getMetadataStructSize(metadata);
   const size_t sizeToAdd = nameSize + metadataSize;
 
-  const size_t currentSize = buffers[bufferInd].size;
+  const size_t currentSize = buffers[*bufferInd].size;
   const bool reachesMaxSize = currentSize + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) {
-    setBufferStatusAndWaitForNext(READABLE, buffers, &bufferInd);
+    setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
   }
 
-  Buffer* currentBuffer = &buffers[bufferInd];
+  Buffer* currentBuffer = &buffers[*bufferInd];
   byte* bufferData = &currentBuffer->data[currentBuffer->size];
 
-  memcpy(bufferData, data->name, nameSize);
-  memcpy(&bufferData[nameSize], &data->metadata, metadataSize);
+  memcpy(bufferData, name, nameSize);
+  memcpy(&bufferData[nameSize], metadata, metadataSize);
   currentBuffer->size += sizeToAdd;
-
-  return bufferInd;
 }

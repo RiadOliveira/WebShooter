@@ -16,12 +16,19 @@ typedef struct {
   Buffer* buffers;
 } WriteThreadParams;
 
+typedef struct {
+  Buffer* buffers;
+  uint bufferInd;
+  ContentData contentData;
+  char fullPath[PATH_MAX_SIZE];
+} WebbingData;
+
 void* handleContentsReading(void*);
 void* handleArchiveWriting(void*);
 
-void webFolderIntoBuffer(ContentData*, Buffer*, char*, size_t);
-void handleFolderSubContentsReadingIntoBuffer(DIR*, Buffer*, char*, size_t);
-void webFileIntoBuffer(ContentData*, Buffer*, const char*);
-uint parseBufferForWebbing(ContentData*, Buffer*);
+void webFolderIntoBuffers(WebbingData*, size_t);
+void webFolderSubContentsIntoBuffers(DIR*, WebbingData*, size_t);
+void webFileIntoBuffers(WebbingData*);
+void parseBuffersForWebbing(WebbingData*);
 
 #endif
