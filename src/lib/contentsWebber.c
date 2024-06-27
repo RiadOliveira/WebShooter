@@ -21,14 +21,11 @@ void webContentsIntoArchive(WstParams* params) {
 void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
   WebbingData data = {parsedParams->buffers, 0};
-  Metadata* metadata = &data.contentData.metadata;
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     strcpy(data.fullPath, parsedParams->contentPaths[ind]);
     fillContentData(&data.contentData, data.fullPath);
-
-    if(isFolder(metadata)) webFolderIntoBuffers(&data, strlen(data.fullPath));
-    else webFileIntoBuffers(&data);
+    redirectContentToHandler(&data);
   }
 
   finishBuffersReading(data.buffers, &data.bufferInd);
@@ -54,13 +51,13 @@ void* handleArchiveWriting(void* params) {
   fclose(archive);
 }
 
-void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
+void webFolderIntoBuffers(WebbingData* data) {
   DIR* folder = openFolderOrExit(data->fullPath);
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
   parseBuffersForWebbing(data);
-  webFolderSubContentsIntoBuffers(folder, data, pathLength);
+  webFolderSubContentsIntoBuffers(folder, data);
 
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
@@ -73,13 +70,12 @@ void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
   closedir(folder);
 }
 
-void webFolderSubContentsIntoBuffers(
-  DIR* folder, WebbingData* data, size_t pathLength
-) {
-  struct dirent* subContentDirent;
+void webFolderSubContentsIntoBuffers(DIR* folder, WebbingData* data) {
   char* fullPath = data->fullPath;
+  const size_t pathLength = strlen(fullPath);
   ContentData* contentData = &data->contentData;
 
+  struct dirent* subContentDirent;
   while((subContentDirent = readdir(folder)) != NULL) {
     if(isEmptySubContent(subContentDirent->d_name)) continue;
 
@@ -87,11 +83,7 @@ void webFolderSubContentsIntoBuffers(
     strcpy(contentData->name, subContentDirent->d_name);
     setContentMetadata(&contentData->metadata, fullPath);
 
-    if(isFile(&contentData->metadata)) webFileIntoBuffers(data);
-    else {
-      const size_t fullLength = pathLength + strlen(&fullPath[pathLength]);
-      webFolderIntoBuffers(data, fullLength);
-    }
+    redirectContentToHandler(data);
   }
 }
 
@@ -118,6 +110,11 @@ void webFileIntoBuffers(WebbingData* data) {
   } while(hasMoreBytesToRead);
 
   fclose(content);
+}
+
+inline void redirectContentToHandler(WebbingData* data) {
+  const bool folder = isFolder(&data->contentData.metadata);
+  (folder ? webFolderIntoBuffers : webFileIntoBuffers)(data);
 }
 
 void parseBuffersForWebbing(WebbingData* data) {

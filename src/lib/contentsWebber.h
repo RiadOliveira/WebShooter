@@ -26,9 +26,11 @@ typedef struct {
 void* handleContentsReading(void*);
 void* handleArchiveWriting(void*);
 
-void webFolderIntoBuffers(WebbingData*, size_t);
-void webFolderSubContentsIntoBuffers(DIR*, WebbingData*, size_t);
+void webFolderIntoBuffers(WebbingData*);
+void webFolderSubContentsIntoBuffers(DIR*, WebbingData*);
 void webFileIntoBuffers(WebbingData*);
+
+void redirectContentToHandler(WebbingData*);
 void parseBuffersForWebbing(WebbingData*);
 
 #endif
