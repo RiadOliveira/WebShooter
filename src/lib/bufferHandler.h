@@ -27,9 +27,6 @@ void consumeBuffersBytes(
   byte* dest, Buffer* buffers, uint* bufferInd, size_t bytesQuantity
 );
 
-void getIndOfFirstBufferWithStatus(
-  Buffer* buffers, uint* bufferInd, BufferStatus status
-);
 void setBufferStatusAndWaitForNext(
   BufferStatus status, Buffer* buffers, uint* bufferInd
 );

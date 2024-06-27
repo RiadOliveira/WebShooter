@@ -55,13 +55,13 @@ void* handleArchiveWriting(void* params) {
 
 void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
   DIR* folder = openFolderOrExit(data->fullPath);
-  parseBuffersForWebbing(data);
-  webFolderSubContentsIntoBuffers(folder, data, pathLength);
-
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
-  getIndOfFirstBufferWithStatus(buffers, bufferInd, UNSET);
+  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
+  parseBuffersForWebbing(data);
+  webFolderSubContentsIntoBuffers(folder, data, pathLength);
+
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
     setBufferStatusAndWaitForNext(READABLE, buffers, bufferInd);
@@ -76,9 +76,9 @@ void webFolderIntoBuffers(WebbingData* data, size_t pathLength) {
 void webFolderSubContentsIntoBuffers(
   DIR* folder, WebbingData* data, size_t pathLength
 ) {
+  struct dirent* subContentDirent;
   char* fullPath = data->fullPath;
   ContentData* contentData = &data->contentData;
-  struct dirent* subContentDirent;
 
   while((subContentDirent = readdir(folder)) != NULL) {
     if(isEmptySubContent(subContentDirent->d_name)) continue;
@@ -97,10 +97,12 @@ void webFolderSubContentsIntoBuffers(
 
 void webFileIntoBuffers(WebbingData* data) {
   FILE* content = openFileOrExit(data->fullPath, READ_BINARY_MODE);
-  parseBuffersForWebbing(data);
-
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
+
+  waitForBufferStatusMismatch(&buffers[*bufferInd], READABLE);
+  parseBuffersForWebbing(data);
+
   bool hasMoreBytesToRead;
   do {
     Buffer* currentBuffer = &buffers[*bufferInd];
@@ -123,7 +125,6 @@ void webFileIntoBuffers(WebbingData* data) {
 void parseBuffersForWebbing(WebbingData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
-  getIndOfFirstBufferWithStatus(buffers, bufferInd, UNSET);
 
   char* name = data->contentData.name;
   Metadata* metadata = &data->contentData.metadata;
