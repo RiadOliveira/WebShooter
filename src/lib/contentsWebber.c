@@ -21,13 +21,14 @@ void webContentsIntoArchive(WstParams* params) {
 void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
   WebbingData data = {parsedParams->buffers, 0};
+  Metadata* metadata = &data.contentData.metadata;
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     strcpy(data.fullPath, parsedParams->contentPaths[ind]);
     fillContentData(&data.contentData, data.fullPath);
 
-    if(isFile(&data.contentData.metadata)) webFileIntoBuffers(&data);
-    else webFolderIntoBuffers(&data, strlen(data.fullPath));
+    if(isFolder(metadata)) webFolderIntoBuffers(&data, strlen(data.fullPath));
+    else webFileIntoBuffers(&data);
   }
 
   finishBuffersReading(data.buffers, &data.bufferInd);

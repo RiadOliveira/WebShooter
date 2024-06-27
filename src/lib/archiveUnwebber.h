@@ -15,11 +15,20 @@ typedef struct {
   Buffer* buffers;
 } WriteThreadParams;
 
+typedef struct {
+  Buffer* buffers;
+  uint bufferInd;
+  ContentData contentData;
+} UnwebbingData;
+
 void* handleArchiveReading(void*);
 void* handleContentsWriting(void*);
 
-void getContentDataFromBuffers(ContentData*, Buffer*, uint*);
-void getContentNameFromBuffers(char*, Buffer*, uint*);
-void getContentMetadataFromBuffers(Metadata*, Buffer*, uint*);
+void getContentDataFromBuffers(UnwebbingData*);
+void getContentNameFromBuffers(UnwebbingData*);
+void getContentMetadataFromBuffers(UnwebbingData*);
+
+void unwebFolderFromBuffers(UnwebbingData*);
+void unwebFileFromBuffers(UnwebbingData*);
 
 #endif

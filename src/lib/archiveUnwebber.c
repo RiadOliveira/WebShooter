@@ -42,38 +42,47 @@ void* handleArchiveReading(void* params) {
 
 void* handleContentsWriting(void* params) {
   WriteThreadParams* parsedParams = (WriteThreadParams*)params;
-  Buffer* buffers = parsedParams->buffers;
+  UnwebbingData data = {parsedParams->buffers, 0};
+  Metadata* metadata = &data.contentData.metadata;
 
-  ContentData data;
-  uint bufferInd = 0;
-  waitForBufferStatusMismatch(&buffers[bufferInd], UNSET);
+  Buffer* buffers = data.buffers;
+  uint* bufferInd = &data.bufferInd;
+  waitForBufferStatusMismatch(&buffers[*bufferInd], UNSET);
   do {
-    getContentDataFromBuffers(&data, buffers, &bufferInd);
-  } while(buffers[bufferInd].status != FINISHED);
+    getContentDataFromBuffers(&data);
+
+    if(isFolder(metadata)) unwebFolderFromBuffers(&data);
+    else unwebFileFromBuffers(&data);
+  } while(buffers[*bufferInd].status != FINISHED);
 }
 
-inline void getContentDataFromBuffers(
-  ContentData* data, Buffer* buffers, uint* bufferInd
-) {
-  getContentNameFromBuffers(data->name, buffers, bufferInd);
-  getContentMetadataFromBuffers(&data->metadata, buffers, bufferInd);
+inline void getContentDataFromBuffers(UnwebbingData* data) {
+  getContentNameFromBuffers(data);
+  getContentMetadataFromBuffers(data);
 }
 
-inline void getContentNameFromBuffers(
-  char* name, Buffer* buffers, uint* bufferInd
-) {
+inline void getContentNameFromBuffers(UnwebbingData* data) {
+  char* name = data->contentData.name;
   uint nameInd = 0;
-  do consumeBuffersBytes(&name[nameInd], buffers, bufferInd, 1);
+
+  do consumeBuffersBytes(&name[nameInd], data->buffers, &data->bufferInd, 1);
   while(name[nameInd++] != NULL_TERMINATOR);
 }
 
-inline void getContentMetadataFromBuffers(
-  Metadata* metadata, Buffer* buffers, uint* bufferInd
-) {
+inline void getContentMetadataFromBuffers(UnwebbingData* data) {
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
+
+  Metadata* metadata = &data->contentData.metadata;
   byte* metadataBytes = (byte*)metadata;
+
   consumeBuffersBytes(metadataBytes, buffers, bufferInd, METADATA_MODE_SIZE);
   metadataBytes += METADATA_MODE_SIZE;
 
   const size_t sizeLeft = getMetadataStructSize(metadata) - METADATA_MODE_SIZE;
   consumeBuffersBytes(metadataBytes, buffers, bufferInd, sizeLeft);
 }
+
+void unwebFolderFromBuffers(UnwebbingData* data) {}
+
+void unwebFileFromBuffers(UnwebbingData* data) {}
