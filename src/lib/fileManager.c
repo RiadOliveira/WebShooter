@@ -2,7 +2,7 @@
 
 inline FILE* openFileOrExit(const char* path, const char* modes) {
   FILE* file = fopen(path, modes);
-  if(file == NULL || *path == PATH_SEPARATOR) {
+  if(file == NULL) {
     exitWithMessage("Error opening the following file: %s", path);
   }
 
@@ -11,7 +11,7 @@ inline FILE* openFileOrExit(const char* path, const char* modes) {
 
 inline DIR* openFolderOrExit(const char* path) {
   DIR* folder = opendir(path);
-  if(folder == NULL || *path == PATH_SEPARATOR) {
+  if(folder == NULL) {
     exitWithMessage("Error opening the following folder: %s", path);
   }
 
