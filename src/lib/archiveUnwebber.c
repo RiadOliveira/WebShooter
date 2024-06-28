@@ -9,7 +9,9 @@ void unwebArchiveIntoContents(WstParams* params) {
   pthread_create(&readThread, NULL, handleArchiveReading, &readParams);
 
   pthread_t writingThread;
-  WriteThreadParams writingParams = {*params->contentPaths, buffers};
+  WriteThreadParams writingParams = {
+    params->contentPaths == NULL ? CWD : *params->contentPaths, buffers
+  };
   pthread_create(&writingThread, NULL, handleContentsWriting, &writingParams);
 
   pthread_join(writingThread, NULL);

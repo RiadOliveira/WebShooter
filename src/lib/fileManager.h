@@ -14,6 +14,7 @@
 
 #define DEFAULT_FOLDER_PERMISSIONS 0755
 
+#define CWD "."
 #define READ_BINARY_MODE "rb"
 #define WRITE_BINARY_MODE "wb"
 

@@ -24,6 +24,9 @@ int main(int argc, char** argv) {
 
 inline void fillParams(WstParams* params, ParsedArguments* arguments) {
   params->archivePath = *arguments->contents;
-  params->contentPaths = (const char**)&arguments->contents[1];
   params->contentsQuantity = arguments->contentsQuantity - 1;
+
+  const bool noContentsPassed = params->contentsQuantity == 0;
+  params->contentPaths =
+    noContentsPassed ? NULL : (const char**)&arguments->contents[1];
 }

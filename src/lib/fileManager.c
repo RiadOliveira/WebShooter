@@ -2,20 +2,16 @@
 
 inline FILE* openFileOrExit(const char* path, const char* modes) {
   FILE* file = fopen(path, modes);
-  if(file == NULL) {
-    exitWithMessage("Error opening the following file: %s", path);
-  }
+  if(file != NULL) return file;
 
-  return file;
+  exitWithMessage("Error opening the following file: %s", path);
 }
 
 inline DIR* openFolderOrExit(const char* path) {
   DIR* folder = opendir(path);
-  if(folder == NULL) {
-    exitWithMessage("Error opening the following folder: %s", path);
-  }
+  if(folder != NULL) return folder;
 
-  return folder;
+  exitWithMessage("Error opening the following folder: %s", path);
 }
 
 inline void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
