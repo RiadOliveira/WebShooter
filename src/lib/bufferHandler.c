@@ -20,6 +20,10 @@ inline void finalizeBuffers(Buffer* buffers, size_t quantity) {
   }
 }
 
+inline byte getBufferCurrentByte(Buffer* buffer) {
+  return buffer->data[buffer->consumedSize];
+}
+
 void consumeBuffersBytes(
   byte* dest, Buffer* buffers, uint* bufferInd, size_t bytesQuantity
 ) {
@@ -32,7 +36,7 @@ void consumeBuffersBytes(
 
   const bool bufferFullyConsumed = quantityToConsume == maxSizeConsumable;
   if(bufferFullyConsumed) {
-    setBufferStatusAndWaitForNext(UNSET, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(buffers, bufferInd, UNSET);
 
     currentBuffer = &buffers[*bufferInd];
     quantityToConsume = bytesQuantity - maxSizeConsumable;
@@ -42,15 +46,27 @@ void consumeBuffersBytes(
   currentBuffer->consumedSize += quantityToConsume;
 }
 
+inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
+  const bool currentHasData = buffers[*bufferInd].size > 0;
+  if(currentHasData) {
+    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
+  }
+
+  setBufferStatus(&buffers[*bufferInd], FINISHED);
+}
+
 inline void setBufferStatusAndWaitForNext(
-  BufferStatus status, Buffer* buffers, uint* bufferInd
+  Buffer* buffers, uint* bufferInd, BufferStatus status
 ) {
-  Buffer* selectedBuffer = &buffers[*bufferInd];
-  selectedBuffer->status = status;
-  pthread_cond_signal(&selectedBuffer->cond);
+  setBufferStatus(&buffers[*bufferInd], status);
 
   if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
   waitForBufferStatusMismatch(&buffers[*bufferInd], status);
+}
+
+inline void setBufferStatus(Buffer* buffer, BufferStatus status) {
+  buffer->status = status;
+  pthread_cond_signal(&buffer->cond);
 }
 
 inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {
@@ -59,13 +75,4 @@ inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {
   pthread_mutex_lock(mutex);
   while(buffer->status == status) pthread_cond_wait(&buffer->cond, mutex);
   pthread_mutex_unlock(mutex);
-}
-
-inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
-  const bool currentBufferHasData = buffers[*bufferInd].size > 0;
-  if(currentBufferHasData) {
-    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
-  }
-
-  buffers[*bufferInd].status = FINISHED;
 }

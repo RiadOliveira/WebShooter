@@ -18,7 +18,7 @@ inline DIR* openFolderOrExit(const char* path) {
   return folder;
 }
 
-void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
+inline void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
   struct utimbuf timesData = {metadata->atime, metadata->mtime};
 
   bool successfullySet = chmod(path, metadata->mode) != -1;
@@ -31,9 +31,11 @@ void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
 
 inline void createFolder(const char* path) {
   struct stat pathStat;
-  if(stat(path, &pathStat) == 0) return;
 
-  if(mkdir(path, 0777) == 0) return;
+  bool successfullyCreated = stat(path, &pathStat) == 0;
+  successfullyCreated |= mkdir(path, DEFAULT_FOLDER_PERMISSIONS) == 0;
+
+  if(successfullyCreated) return;
   exitWithMessage("Error creating the folder indicated by the path: %s", path);
 }
 

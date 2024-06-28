@@ -23,14 +23,16 @@ typedef struct {
 void initializeBuffers(Buffer* buffers, size_t quantity);
 void finalizeBuffers(Buffer* buffers, size_t quantity);
 
+byte getBufferCurrentByte(Buffer* buffer);
 void consumeBuffersBytes(
   byte* dest, Buffer* buffers, uint* bufferInd, size_t bytesQuantity
 );
 
-void setBufferStatusAndWaitForNext(
-  BufferStatus status, Buffer* buffers, uint* bufferInd
-);
-void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status);
 void finishBuffersReading(Buffer* buffers, uint* bufferInd);
+void setBufferStatusAndWaitForNext(
+  Buffer* buffers, uint* bufferInd, BufferStatus status
+);
+void setBufferStatus(Buffer* buffer, BufferStatus status);
+void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status);
 
 #endif

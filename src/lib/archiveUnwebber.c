@@ -31,7 +31,7 @@ void* handleArchiveReading(void* params) {
     currentBuffer->consumedSize = 0;
 
     if(hasMoreBytesToRead = (currentBuffer->size > 0)) {
-      setBufferStatusAndWaitForNext(CONSUMABLE, buffers, &bufferInd);
+      setBufferStatusAndWaitForNext(buffers, &bufferInd, CONSUMABLE);
     }
   } while(hasMoreBytesToRead);
 
@@ -84,7 +84,27 @@ inline void getContentMetadataFromBuffers(WebbingOperationData* data) {
   consumeBuffersBytes(metadataBytes, buffers, bufferInd, sizeLeft);
 }
 
-void unwebFolderFromBuffers(WebbingOperationData* data) {}
+void unwebFolderFromBuffers(WebbingOperationData* data) {
+  char* fullPath = data->fullPath;
+  const size_t pathLength = strlen(fullPath);
+  createFolder(fullPath);
+
+  Buffer* currentBuffer = &data->buffers[data->bufferInd];
+  while(getBufferCurrentByte(currentBuffer) != FOLDER_TERMINATOR) {
+    getContentDataFromBuffers(data);
+    appendPath(fullPath, pathLength, data->contentData.name);
+    unwebContent(data);
+
+    currentBuffer = &data->buffers[data->bufferInd];
+  }
+
+  const size_t consumedSizeAfterTerminator = ++currentBuffer->consumedSize;
+  if(consumedSizeAfterTerminator == currentBuffer->size) {
+    setBufferStatusAndWaitForNext(data->buffers, &data->bufferInd, UNSET);
+  }
+
+  fullPath[pathLength] = NULL_TERMINATOR;
+}
 
 void unwebFileFromBuffers(WebbingOperationData* data) {
   FILE* file = openFileOrExit(data->fullPath, WRITE_BINARY_MODE);
@@ -104,7 +124,7 @@ void unwebFileFromBuffers(WebbingOperationData* data) {
     bytesWritten += sizeToConsume;
 
     if(sizeToConsume == remainingBufferSize) {
-      setBufferStatusAndWaitForNext(UNSET, data->buffers, &data->bufferInd);
+      setBufferStatusAndWaitForNext(data->buffers, &data->bufferInd, UNSET);
     }
   } while(bytesWritten < fileSize);
 
@@ -112,8 +132,10 @@ void unwebFileFromBuffers(WebbingOperationData* data) {
 }
 
 inline void unwebContent(WebbingOperationData* data) {
-  const bool folder = isFolder(&data->contentData.metadata);
+  Metadata metadata = data->contentData.metadata;
+
+  const bool folder = isFolder(&metadata);
   (folder ? unwebFolderFromBuffers : unwebFileFromBuffers)(data);
 
-  setFileOrFolderMetadata(data->fullPath, &data->contentData.metadata);
+  setFileOrFolderMetadata(data->fullPath, &metadata);
 }

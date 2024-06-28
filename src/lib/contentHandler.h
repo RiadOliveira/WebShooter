@@ -9,6 +9,8 @@
 #include "fileManager.h"
 #include "shortcutTypes.h"
 
+#define FOLDER_TERMINATOR PATH_SEPARATOR
+
 typedef struct {
   char name[CONTENT_NAME_MAX_SIZE];
   Metadata metadata;

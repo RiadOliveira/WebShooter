@@ -44,7 +44,7 @@ void* handleArchiveWriting(void* params) {
     fwrite(currentBuffer->data, 1, currentBuffer->size, archive);
     currentBuffer->size = 0;
 
-    setBufferStatusAndWaitForNext(UNSET, buffers, &bufferInd);
+    setBufferStatusAndWaitForNext(buffers, &bufferInd, UNSET);
     currentBuffer = &buffers[bufferInd];
   } while(currentBuffer->status != FINISHED);
 
@@ -61,11 +61,11 @@ void webFolderIntoBuffers(WebbingOperationData* data) {
 
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
-    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
-  currentBuffer->data[currentBuffer->size++] = PATH_SEPARATOR;
+  currentBuffer->data[currentBuffer->size++] = FOLDER_TERMINATOR;
 
   closedir(folder);
 }
@@ -104,7 +104,7 @@ void webFileIntoBuffers(WebbingOperationData* data) {
     currentBuffer->size += bytesRead;
 
     if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
-      setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
+      setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
     }
   } while(hasMoreBytesToRead);
 
@@ -131,7 +131,7 @@ void parseBuffersForWebbing(WebbingOperationData* data) {
   const size_t currentSize = buffers[*bufferInd].size;
   const bool reachesMaxSize = currentSize + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) {
-    setBufferStatusAndWaitForNext(CONSUMABLE, buffers, bufferInd);
+    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
