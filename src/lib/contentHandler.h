@@ -16,7 +16,7 @@ typedef struct {
   Metadata metadata;
 } ContentData;
 
-void fillContentData(ContentData* data, const char* path);
+void getContentData(ContentData* data, const char* path);
 void getContentName(char* name, const char* path);
 void getContentMetadata(Metadata* metadata, const char* path);
 

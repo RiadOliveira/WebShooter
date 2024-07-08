@@ -47,10 +47,11 @@ void consumeBuffersBytes(
 }
 
 inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
-  const bool currentHasData = buffers[*bufferInd].size > 0;
-  if(currentHasData) {
+  const bool currentBufferHasData = buffers[*bufferInd].size > 0;
+
+  if(currentBufferHasData) {
     setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
-  }
+  } else waitForBufferStatusMismatch(&buffers[*bufferInd], CONSUMABLE);
 
   setBufferStatus(&buffers[*bufferInd], FINISHED);
 }
@@ -65,8 +66,12 @@ inline void setBufferStatusAndWaitForNext(
 }
 
 inline void setBufferStatus(Buffer* buffer, BufferStatus status) {
+  pthread_mutex_t* mutex = &buffer->mutex;
+
+  pthread_mutex_lock(mutex);
   buffer->status = status;
   pthread_cond_signal(&buffer->cond);
+  pthread_mutex_unlock(mutex);
 }
 
 inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {

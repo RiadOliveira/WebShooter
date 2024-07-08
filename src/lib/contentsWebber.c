@@ -24,7 +24,7 @@ void* handleContentsReading(void* params) {
 
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     strcpy(data.fullPath, parsedParams->contentPaths[ind]);
-    fillContentData(&data.contentData, data.fullPath);
+    getContentData(&data.contentData, data.fullPath);
     webContent(&data);
   }
 
@@ -56,7 +56,6 @@ void webFolderIntoBuffers(WebbingOperationData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
-  parseBuffersForWebbing(data);
   webFolderSubContentsIntoBuffers(folder, data);
 
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
@@ -89,10 +88,9 @@ void webFolderSubContentsIntoBuffers(DIR* folder, WebbingOperationData* data) {
 
 void webFileIntoBuffers(WebbingOperationData* data) {
   FILE* file = openFileOrExit(data->fullPath, READ_BINARY_MODE);
-  parseBuffersForWebbing(data);
-
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
+
   bool hasMoreBytesToRead;
   do {
     Buffer* currentBuffer = &buffers[*bufferInd];
@@ -112,6 +110,8 @@ void webFileIntoBuffers(WebbingOperationData* data) {
 }
 
 inline void webContent(WebbingOperationData* data) {
+  parseBuffersForWebbing(data);
+
   const bool folder = isFolder(&data->contentData.metadata);
   (folder ? webFolderIntoBuffers : webFileIntoBuffers)(data);
 }

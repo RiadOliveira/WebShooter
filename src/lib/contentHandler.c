@@ -3,7 +3,7 @@
 const char* LOCATING_ERROR_MESSAGE =
   "Error while locating the content identified by the path: %s\n";
 
-inline void fillContentData(ContentData* data, const char* path) {
+inline void getContentData(ContentData* data, const char* path) {
   getContentName(data->name, path);
   getContentMetadata(&data->metadata, path);
 }
