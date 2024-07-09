@@ -91,20 +91,24 @@ void webFileIntoBuffers(WebbingOperationData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
 
-  bool hasMoreBytesToRead;
+  const size_t fileSize = data->contentData.metadata.size;
+  size_t bytesRead = 0;
   do {
     Buffer* currentBuffer = &buffers[*bufferInd];
-    const size_t currentSize = currentBuffer->size;
-    const size_t maxSizeReadable = BUFFER_MAX_SIZE - currentSize;
+    size_t* size = &currentBuffer->size;
 
-    byte* currentData = &currentBuffer->data[currentSize];
-    const size_t bytesRead = fread(currentData, 1, maxSizeReadable, file);
-    currentBuffer->size += bytesRead;
+    const size_t remainingBufferSize = BUFFER_MAX_SIZE - *size;
+    const size_t remainingFileSize = fileSize - bytesRead;
+    const size_t sizeToRead = min(remainingBufferSize, remainingFileSize);
 
-    if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
+    byte* currentData = &currentBuffer->data[*size];
+    *size += fread(currentData, 1, sizeToRead, file);
+    bytesRead += sizeToRead;
+
+    if(sizeToRead == remainingBufferSize) {
       unlockCurrentBufferToGetNextLocked(buffers, bufferInd, CONSUMABLE);
     }
-  } while(hasMoreBytesToRead);
+  } while(bytesRead < fileSize);
 
   fclose(file);
 }

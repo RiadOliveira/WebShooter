@@ -1,5 +1,7 @@
-/debug
-/release
-/tmp
+/debug/*
+!/debug/.gitkeep
+/release/*
+!/release/.gitkeep
 
-output.*
+/tmp
+output*
