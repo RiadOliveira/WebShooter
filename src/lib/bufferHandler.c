@@ -36,7 +36,7 @@ void consumeBuffersBytes(
 
   const bool bufferFullyConsumed = quantityToConsume == maxSizeConsumable;
   if(bufferFullyConsumed) {
-    setBufferStatusAndWaitForNext(buffers, bufferInd, UNSET);
+    unlockCurrentBufferToGetNextLocked(buffers, bufferInd, UNSET);
 
     currentBuffer = &buffers[*bufferInd];
     quantityToConsume = bytesQuantity - maxSizeConsumable;
@@ -48,36 +48,33 @@ void consumeBuffersBytes(
 
 inline void finishBuffersReading(Buffer* buffers, uint* bufferInd) {
   const bool currentBufferHasData = buffers[*bufferInd].size > 0;
-
   if(currentBufferHasData) {
-    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
-  } else waitForBufferStatusMismatch(&buffers[*bufferInd], CONSUMABLE);
+    unlockCurrentBufferToGetNextLocked(buffers, bufferInd, CONSUMABLE);
+  }
 
-  setBufferStatus(&buffers[*bufferInd], FINISHED);
+  unlockBuffer(&buffers[*bufferInd], FINISHED);
 }
 
-inline void setBufferStatusAndWaitForNext(
+inline void unlockCurrentBufferToGetNextLocked(
   Buffer* buffers, uint* bufferInd, BufferStatus status
 ) {
-  setBufferStatus(&buffers[*bufferInd], status);
+  unlockBuffer(&buffers[*bufferInd], status);
 
   if(++(*bufferInd) == BUFFERS_QUANTITY) *bufferInd = 0;
-  waitForBufferStatusMismatch(&buffers[*bufferInd], status);
+  lockBufferWhenStatusMismatch(&buffers[*bufferInd], status);
 }
 
-inline void setBufferStatus(Buffer* buffer, BufferStatus status) {
+inline void unlockBuffer(Buffer* buffer, BufferStatus status) {
   pthread_mutex_t* mutex = &buffer->mutex;
 
-  pthread_mutex_lock(mutex);
   buffer->status = status;
   pthread_cond_signal(&buffer->cond);
   pthread_mutex_unlock(mutex);
 }
 
-inline void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status) {
+inline void lockBufferWhenStatusMismatch(Buffer* buffer, BufferStatus status) {
   pthread_mutex_t* mutex = &buffer->mutex;
 
   pthread_mutex_lock(mutex);
   while(buffer->status == status) pthread_cond_wait(&buffer->cond, mutex);
-  pthread_mutex_unlock(mutex);
 }

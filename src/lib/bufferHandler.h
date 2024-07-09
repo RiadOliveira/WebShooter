@@ -29,10 +29,10 @@ void consumeBuffersBytes(
 );
 
 void finishBuffersReading(Buffer* buffers, uint* bufferInd);
-void setBufferStatusAndWaitForNext(
+void unlockCurrentBufferToGetNextLocked(
   Buffer* buffers, uint* bufferInd, BufferStatus status
 );
-void setBufferStatus(Buffer* buffer, BufferStatus status);
-void waitForBufferStatusMismatch(Buffer* buffer, BufferStatus status);
+void unlockBuffer(Buffer* buffer, BufferStatus status);
+void lockBufferWhenStatusMismatch(Buffer* buffer, BufferStatus status);
 
 #endif

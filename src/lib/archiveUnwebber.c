@@ -24,6 +24,8 @@ void* handleArchiveReading(void* params) {
   FILE* archive = openFileOrExit(parsedParams->archivePath, READ_BINARY_MODE);
 
   uint bufferInd = 0;
+  lockBufferWhenStatusMismatch(&buffers[bufferInd], CONSUMABLE);
+
   bool hasMoreBytesToRead;
   do {
     Buffer* currentBuffer = &buffers[bufferInd];
@@ -33,7 +35,7 @@ void* handleArchiveReading(void* params) {
     currentBuffer->consumedSize = 0;
 
     if(hasMoreBytesToRead = (currentBuffer->size > 0)) {
-      setBufferStatusAndWaitForNext(buffers, &bufferInd, CONSUMABLE);
+      unlockCurrentBufferToGetNextLocked(buffers, &bufferInd, CONSUMABLE);
     }
   } while(hasMoreBytesToRead);
 
@@ -50,13 +52,15 @@ void* handleContentsWriting(void* params) {
 
   Buffer* buffers = data.buffers;
   uint* bufferInd = &data.bufferInd;
-  waitForBufferStatusMismatch(&buffers[*bufferInd], UNSET);
+  lockBufferWhenStatusMismatch(&buffers[*bufferInd], UNSET);
 
   do {
     getContentDataFromBuffers(&data);
     appendPath(data.fullPath, basePathLength, data.contentData.name);
     unwebContent(&data);
   } while(buffers[*bufferInd].status != FINISHED);
+
+  unlockBuffer(&buffers[*bufferInd], UNSET);
 }
 
 inline void getContentDataFromBuffers(WebbingOperationData* data) {
@@ -102,7 +106,7 @@ void unwebFolderFromBuffers(WebbingOperationData* data) {
 
   const size_t consumedSizeAfterTerminator = ++currentBuffer->consumedSize;
   if(consumedSizeAfterTerminator == currentBuffer->size) {
-    setBufferStatusAndWaitForNext(data->buffers, &data->bufferInd, UNSET);
+    unlockCurrentBufferToGetNextLocked(data->buffers, &data->bufferInd, UNSET);
   }
 
   fullPath[pathLength] = NULL_TERMINATOR;
@@ -110,11 +114,13 @@ void unwebFolderFromBuffers(WebbingOperationData* data) {
 
 void unwebFileFromBuffers(WebbingOperationData* data) {
   FILE* file = openFileOrExit(data->fullPath, WRITE_BINARY_MODE);
+  Buffer* buffers = data->buffers;
+  uint* bufferInd = &data->bufferInd;
 
   const size_t fileSize = data->contentData.metadata.size;
   size_t bytesWritten = 0;
   do {
-    Buffer* currentBuffer = &data->buffers[data->bufferInd];
+    Buffer* currentBuffer = &buffers[*bufferInd];
     size_t* consumedSize = &currentBuffer->consumedSize;
 
     const size_t remainingBufferSize = currentBuffer->size - *consumedSize;
@@ -126,7 +132,7 @@ void unwebFileFromBuffers(WebbingOperationData* data) {
     bytesWritten += sizeToConsume;
 
     if(sizeToConsume == remainingBufferSize) {
-      setBufferStatusAndWaitForNext(data->buffers, &data->bufferInd, UNSET);
+      unlockCurrentBufferToGetNextLocked(buffers, bufferInd, UNSET);
     }
   } while(bytesWritten < fileSize);
 

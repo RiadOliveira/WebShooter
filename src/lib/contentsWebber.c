@@ -22,6 +22,7 @@ void* handleContentsReading(void* params) {
   ReadThreadParams* parsedParams = (ReadThreadParams*)params;
   WebbingOperationData data = {parsedParams->buffers, 0};
 
+  lockBufferWhenStatusMismatch(&data.buffers[data.bufferInd], CONSUMABLE);
   for(size_t ind = 0; ind < parsedParams->contentsQuantity; ind++) {
     strcpy(data.fullPath, parsedParams->contentPaths[ind]);
     getContentData(&data.contentData, data.fullPath);
@@ -38,35 +39,34 @@ void* handleArchiveWriting(void* params) {
 
   uint bufferInd = 0;
   Buffer* currentBuffer = &buffers[bufferInd];
-  waitForBufferStatusMismatch(currentBuffer, UNSET);
+  lockBufferWhenStatusMismatch(currentBuffer, UNSET);
 
   do {
     fwrite(currentBuffer->data, 1, currentBuffer->size, archive);
     currentBuffer->size = 0;
 
-    setBufferStatusAndWaitForNext(buffers, &bufferInd, UNSET);
+    unlockCurrentBufferToGetNextLocked(buffers, &bufferInd, UNSET);
     currentBuffer = &buffers[bufferInd];
   } while(currentBuffer->status != FINISHED);
 
+  unlockBuffer(&buffers[bufferInd], UNSET);
   fclose(archive);
 }
 
 void webFolderIntoBuffers(WebbingOperationData* data) {
   DIR* folder = openFolderOrExit(data->fullPath);
+  webFolderSubContentsIntoBuffers(folder, data);
+  closedir(folder);
+
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
-
-  webFolderSubContentsIntoBuffers(folder, data);
-
   const bool reachedMaxSize = buffers[*bufferInd].size == BUFFER_MAX_SIZE;
   if(reachedMaxSize) {
-    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
+    unlockCurrentBufferToGetNextLocked(buffers, bufferInd, CONSUMABLE);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
   currentBuffer->data[currentBuffer->size++] = FOLDER_TERMINATOR;
-
-  closedir(folder);
 }
 
 void webFolderSubContentsIntoBuffers(DIR* folder, WebbingOperationData* data) {
@@ -102,7 +102,7 @@ void webFileIntoBuffers(WebbingOperationData* data) {
     currentBuffer->size += bytesRead;
 
     if(hasMoreBytesToRead = (bytesRead == maxSizeReadable)) {
-      setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
+      unlockCurrentBufferToGetNextLocked(buffers, bufferInd, CONSUMABLE);
     }
   } while(hasMoreBytesToRead);
 
@@ -119,7 +119,6 @@ inline void webContent(WebbingOperationData* data) {
 void parseBuffersForWebbing(WebbingOperationData* data) {
   Buffer* buffers = data->buffers;
   uint* bufferInd = &data->bufferInd;
-  waitForBufferStatusMismatch(&buffers[*bufferInd], CONSUMABLE);
 
   char* name = data->contentData.name;
   Metadata* metadata = &data->contentData.metadata;
@@ -131,7 +130,7 @@ void parseBuffersForWebbing(WebbingOperationData* data) {
   const size_t currentSize = buffers[*bufferInd].size;
   const bool reachesMaxSize = currentSize + sizeToAdd >= BUFFER_MAX_SIZE;
   if(reachesMaxSize) {
-    setBufferStatusAndWaitForNext(buffers, bufferInd, CONSUMABLE);
+    unlockCurrentBufferToGetNextLocked(buffers, bufferInd, CONSUMABLE);
   }
 
   Buffer* currentBuffer = &buffers[*bufferInd];
