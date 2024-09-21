@@ -1,5 +1,5 @@
-#ifndef LIB_WEB_SHOOTER_H
-#define LIB_WEB_SHOOTER_H
+#ifndef LIB_WST_H
+#define LIB_WST_H
 
 #include <stdlib.h>
 
