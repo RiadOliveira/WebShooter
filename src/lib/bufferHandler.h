@@ -7,7 +7,7 @@
 #include "mathUtils.h"
 #include "shortcutTypes.h"
 
-#define BUFFER_MAX_SIZE 1024 * 1000
+#define BUFFER_MAX_SIZE 1024 * 1024
 #define BUFFERS_QUANTITY 2
 
 typedef enum { UNSET, CONSUMABLE, FINISHED } BufferStatus;
