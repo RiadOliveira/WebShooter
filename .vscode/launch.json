@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/debug/wst",
-      "args": ["-w", "output.wbd", "tmp"],
+      "args": ["-w", "output.wbd", "tmp/first.iso", "tmp/second.iso", "tmp/third.iso"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

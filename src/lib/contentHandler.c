@@ -9,9 +9,9 @@ inline void getContentData(ContentData* data, const char* path) {
 }
 
 inline void getContentName(char* name, const char* path) {
-  int ind = -1, nameStartInd = 0;
+  int ind = 0, nameStartInd = 0;
 
-  while(path[++ind] != NULL_TERMINATOR) {
+  do {
     const char currentChar = path[ind];
     const int nameInd = ind - nameStartInd;
 
@@ -21,7 +21,7 @@ inline void getContentName(char* name, const char* path) {
       if(path[nextInd] == NULL_TERMINATOR) name[nameInd] = NULL_TERMINATOR;
       else nameStartInd = nextInd;
     }
-  }
+  } while(path[ind++] != NULL_TERMINATOR);
 }
 
 inline void getContentMetadata(Metadata* metadata, const char* path) {
