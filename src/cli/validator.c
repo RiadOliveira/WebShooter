@@ -15,8 +15,8 @@ const char* HELP_MENU =
   "\t\t%s\n"
   "  -u, --unweb\tUnweb a previously webbed archive into its original "
   "contents.\n"
-  "\t\tRequires an input archive to be unwebbed. If the output path for the "
-  "contents is not provided, the current directory will be used.\n"
+  "\t\tRequires an input archive. If no output path is "
+  "provided, the current path is used.\n"
   "\t\t%s\n"
   "  -h, --help\tShow this help message.\n";
 
