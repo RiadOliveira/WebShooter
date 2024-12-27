@@ -1,5 +1,5 @@
-#ifndef SHORTCUT_TYPES_H_
-#define SHORTCUT_TYPES_H_
+#ifndef SHORTCUT_TYPES
+#define SHORTCUT_TYPES
 
 #include <stdbool.h>
 

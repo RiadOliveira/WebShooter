@@ -1,5 +1,5 @@
-#ifndef BUFFER_HANDLER_H
-#define BUFFER_HANDLER_H
+#ifndef BUFFER_HANDLER
+#define BUFFER_HANDLER
 
 #include <pthread.h>
 #include <string.h>

@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H_
-#define CONSTANTS_H_
+#ifndef CONSTANTS
+#define CONSTANTS
 
 #define PATH_MAX_SIZE 4096
 #define CONTENT_NAME_MAX_SIZE 256

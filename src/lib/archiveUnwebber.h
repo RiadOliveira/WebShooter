@@ -1,5 +1,5 @@
-#ifndef ARCHIVE_UNWEBBER_H
-#define ARCHIVE_UNWEBBER_H
+#ifndef ARCHIVE_UNWEBBER
+#define ARCHIVE_UNWEBBER
 
 #include "libwst.h"
 #include "operationTypes.h"

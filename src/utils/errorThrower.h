@@ -1,5 +1,5 @@
-#ifndef ERROR_THROWER_H_
-#define ERROR_THROWER_H_
+#ifndef ERROR_THROWER
+#define ERROR_THROWER
 
 #include <stdarg.h>
 #include <stdio.h>

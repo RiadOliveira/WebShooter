@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef PARSER
+#define PARSER
 
 #include "cliTypes.h"
 #include "mathUtils.h"

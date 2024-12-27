@@ -1,5 +1,5 @@
-#ifndef VALIDATOR_H
-#define VALIDATOR_H
+#ifndef VALIDATOR
+#define VALIDATOR
 
 #include "cliTypes.h"
 #include "errorThrower.h"

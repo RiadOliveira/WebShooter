@@ -1,5 +1,5 @@
-#ifndef CONTENT_HANDLER_H
-#define CONTENT_HANDLER_H
+#ifndef CONTENT_HANDLER
+#define CONTENT_HANDLER
 
 #include <stdlib.h>
 #include <string.h>

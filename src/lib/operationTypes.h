@@ -1,5 +1,5 @@
-#ifndef OPERATION_TYPES_H
-#define OPERATION_TYPES_H
+#ifndef OPERATION_TYPES
+#define OPERATION_TYPES
 
 #include "bufferHandler.h"
 #include "contentHandler.h"

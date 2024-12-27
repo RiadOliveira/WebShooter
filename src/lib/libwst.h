@@ -1,5 +1,5 @@
-#ifndef LIB_WST_H
-#define LIB_WST_H
+#ifndef LIB_WST
+#define LIB_WST
 
 #include <stdlib.h>
 

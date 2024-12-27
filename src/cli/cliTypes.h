@@ -1,5 +1,5 @@
-#ifndef CLI_TYPES_H
-#define CLI_TYPES_H
+#ifndef CLI_TYPES
+#define CLI_TYPES
 
 #include <stdlib.h>
 

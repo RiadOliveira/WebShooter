@@ -1,5 +1,5 @@
-#ifndef CONTENTS_WEBBER_H
-#define CONTENTS_WEBBER_H
+#ifndef CONTENTS_WEBBER
+#define CONTENTS_WEBBER
 
 #include "libwst.h"
 #include "operationTypes.h"
