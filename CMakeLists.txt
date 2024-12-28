@@ -18,7 +18,7 @@ set(HEADERS
   src/lib/libwst.h
   src/lib/operationTypes.h
 
-  src/utils/errorThrower.h
+  src/utils/error.h
   src/utils/mathUtils.h
   src/utils/shortcutTypes.h
 )
@@ -33,7 +33,7 @@ set(SOURCES
   src/lib/contentsWebber.c
   src/lib/fileManager.c
 
-  src/utils/errorThrower.c
+  src/utils/error.c
 )
 
 list(REMOVE_ITEM SOURCES ${MAIN_FILE})

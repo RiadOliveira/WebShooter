@@ -9,7 +9,7 @@
 #include <utime.h>
 
 #include "constants.h"
-#include "errorThrower.h"
+#include "error.h"
 #include "shortcutTypes.h"
 
 #define DEFAULT_FOLDER_PERMISSIONS 0755

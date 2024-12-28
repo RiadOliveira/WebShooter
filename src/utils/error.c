@@ -1,6 +1,6 @@
-#include "errorThrower.h"
+#include "error.h"
 
-inline void exitWithMessage(const char* format, ...) {
+inline void exitWithError(const char* format, ...) {
   va_list messages;
 
   va_start(messages, format);

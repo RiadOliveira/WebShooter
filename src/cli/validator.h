@@ -2,7 +2,7 @@
 #define VALIDATOR
 
 #include "cliTypes.h"
-#include "errorThrower.h"
+#include "error.h"
 
 void validateArguments(ParsedArguments* arguments);
 void printHelpMenu();

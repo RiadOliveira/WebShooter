@@ -26,12 +26,12 @@ inline void getContentName(char* name, const char* path) {
 
 inline void getContentMetadata(Metadata* metadata, const char* path) {
   struct stat pathStat;
-  if(stat(path, &pathStat) != 0) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
+  if(stat(path, &pathStat) != 0) exitWithError(LOCATING_ERROR_MESSAGE, path);
 
   const uint stMode = pathStat.st_mode;
   const bool file = S_ISREG(stMode);
   const bool folder = S_ISDIR(stMode);
-  if(!file && !folder) exitWithMessage(LOCATING_ERROR_MESSAGE, path);
+  if(!file && !folder) exitWithError(LOCATING_ERROR_MESSAGE, path);
 
   metadata->mode = stMode;
   metadata->uid = pathStat.st_uid;

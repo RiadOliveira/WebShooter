@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "constants.h"
-#include "errorThrower.h"
+#include "error.h"
 #include "fileManager.h"
 #include "shortcutTypes.h"
 

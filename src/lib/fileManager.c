@@ -4,14 +4,14 @@ inline FILE* openFileOrExit(const char* path, const char* modes) {
   FILE* file = fopen(path, modes);
   if(file != NULL) return file;
 
-  exitWithMessage("Error opening the following file: %s", path);
+  exitWithError("Error opening the following file: %s", path);
 }
 
 inline DIR* openFolderOrExit(const char* path) {
   DIR* folder = opendir(path);
   if(folder != NULL) return folder;
 
-  exitWithMessage("Error opening the following folder: %s", path);
+  exitWithError("Error opening the following folder: %s", path);
 }
 
 inline void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
@@ -22,7 +22,7 @@ inline void setFileOrFolderMetadata(const char* path, Metadata* metadata) {
   successfullySet &= utime(path, &timesData) != -1;
 
   if(successfullySet) return;
-  exitWithMessage("Error setting following content metadata: %s", path);
+  exitWithError("Error setting following content metadata: %s", path);
 }
 
 inline void createFolder(const char* path) {
@@ -32,7 +32,7 @@ inline void createFolder(const char* path) {
   successfullyCreated |= mkdir(path, DEFAULT_FOLDER_PERMISSIONS) == 0;
 
   if(successfullyCreated) return;
-  exitWithMessage("Error creating the folder indicated by the path: %s", path);
+  exitWithError("Error creating the folder indicated by the path: %s", path);
 }
 
 inline void appendPath(

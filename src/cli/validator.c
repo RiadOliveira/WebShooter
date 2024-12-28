@@ -25,7 +25,7 @@ void validateArguments(ParsedArguments* arguments) {
 
   switch(arguments->option) {
     case UNSET: {
-      exitWithMessage(
+      exitWithError(
         "Invalid or no option received. For detailed usage instructions, try "
         "'-h' or '--help'.\n%s",
         USAGE_INSTRUCTIONS_GENERAL
@@ -33,7 +33,7 @@ void validateArguments(ParsedArguments* arguments) {
     }
     case WEB: {
       if(contentsQuantity >= 2) break;
-      exitWithMessage(
+      exitWithError(
         "Insufficient arguments passed to perform Web operation! At least "
         "two arguments are required: <output_archive_path> "
         "<content_path>\n\n%s",
@@ -42,7 +42,7 @@ void validateArguments(ParsedArguments* arguments) {
     }
     case UNWEB: {
       if(contentsQuantity >= 1) break;
-      exitWithMessage(
+      exitWithError(
         "Insufficient arguments passed to perform Unweb operation! At least "
         "one argument is required: <archive_to_unweb_path>\n\n%s",
         USAGE_INSTRUCTIONS_UNWEB
