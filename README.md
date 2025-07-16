@@ -5,7 +5,6 @@
 </p>
 
 ![image](https://github.com/user-attachments/assets/2d6788e5-ee2a-4e42-8fbb-4ba1d484c312)
-![image](https://img.shields.io/github/license/RiadOliveira/WebShooter)
 
 <br/>
 
