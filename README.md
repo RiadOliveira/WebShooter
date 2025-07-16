@@ -1,9 +1,10 @@
 <h1 align="center">🕸 WebShooter</h1>
 
 <p align="center">
-  A high-performance archiving utility designed for Unix-like systems that leverages multi-threading with the Producer-Consumer pattern to optimize file archiving and extraction operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
+  A high-performance archiving utility designed for Unix-like systems that leverages multi-threading with the Producer-Consumer pattern to optimize file archiving and unarchiving operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
 </p>
 
+![image](https://github.com/user-attachments/assets/4e94c532-d9c3-4786-89b3-afd530cf4f01)
 ![image](https://img.shields.io/github/license/RiadOliveira/WebShooter)
 
 <br/>
@@ -15,7 +16,8 @@ Contents
 * [🚀 Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation & Setup](#setup)
-  * [CLI Usage](#usage)
+  * [CLI Usage](#cli-usage)
+  * [Library Integration](#library-usage)
 * [📐 Architecture & Logic](#architecture)
   * [Multithreaded Strategy](#strategy)
   * [Archiving Process](#archiving)
@@ -74,7 +76,7 @@ make
 ./wst -h
 ```
 
-<h3 id="usage">CLI Usage</h3>
+<h3 id="cli-usage">CLI Usage</h3>
 
 The CLI offers three main options: archiving (`--web`), unarchiving (`--unweb`), and help.  
 It was designed to be simple and intuitive for both users and developers. <br/><br/>
@@ -84,6 +86,28 @@ It was designed to be simple and intuitive for both users and developers. <br/><
 | `--web` | `-w` | Yes | Archives the specified files/folders into a single output file. Requires the output archive path followed by one or more input paths. |
 | `--unweb` | `-u` | Yes | Extracts contents from a previously created archive. Requires the archive path and optionally a destination path (defaults to current directory). |
 | `--help` | `-h` | No | Displays the full help screen with usage examples and descriptions. |
+
+<h3 id="library-usage">Library Integration</h3>
+
+WebShooter also exposes a simple C API, allowing developers to embed its core functionality into other projects. Below is the definition of the main interface:
+
+```c
+typedef struct {
+  const char* archivePath;       // Path to the archive file (input or output)
+  const char** contentPaths;     // List of files/folders to process
+  size_t contentsQuantity;       // Number of input paths
+} WstParams;
+
+/**
+ * Archives the specified contents into a single archive file.
+ */
+void webContentsIntoArchive(WstParams* params);
+
+/**
+ * Extracts the contents from a given archive into the current or specified directory.
+ */
+void unwebArchiveIntoContents(WstParams* params);
+```
 
 <h2 id="architecture">📐 Architecture & Logic</h2>
 
@@ -147,7 +171,7 @@ WebShooter/
 
 <h2 id="features">⚙️ Features</h2>
 
-- **Multi-threaded Architecture**: Implements producer-consumer pattern with POSIX threads for parallel archiving/extraction.
+- **Multi-threaded Architecture**: Implements producer-consumer pattern with POSIX threads for parallel archiving/unarchiving.
 - **CLI Utility** - User-friendly and flexible command-line interface with simple usage syntax.
 - **Library Support** - Modular library for easy integration in other C applications.
 - **Efficient I/O Handling** - Operates using shared memory buffers, mutexes, and condition variables for synchronization.
