@@ -1,0 +1,28 @@
+{
+  "title": "WebShooter",
+  "extendedDescription": "A high-performance archiving utility designed for Unix-like systems that leverages multi-threading to optimize operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like tar and cpio through parallel processing.",
+  "imageId": "2d6788e5-ee2a-4e42-8fbb-4ba1d484c312",
+  "highlightColor": "blue",
+  "attachmentsUrl": true,
+  "technologies": [
+    "C",
+    "Linux"
+  ],
+  "features": [
+    {
+      "name": "Parallel Archiving",
+      "description": "Multi-threaded archiving using producer-consumer pattern for maximum performance.",
+      "icon": "tachometerAlt"
+    },
+    {
+      "name": "CLI & Library",
+      "description": "Dual-mode operation offering both CLI utility and embeddable C library.",
+      "icon": "terminal"
+    },
+    {
+      "name": "Structure Preservation",
+      "description": "Maintains complete directory hierarchy and file metadata.",
+      "icon": "folderTree"
+    }
+  ]
+}
