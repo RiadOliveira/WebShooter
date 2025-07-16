@@ -1,10 +1,10 @@
 <h1 align="center">🕸 WebShooter</h1>
 
 <p align="center">
-  A high-performance archiving utility designed for Unix-like systems that leverages multi-threading with the Producer-Consumer pattern to optimize file archiving and unarchiving operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
+  WebShooter is a high-performance archiving utility designed for Unix-like systems, leveraging multi-threading to optimize operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
 </p>
 
-![image](https://github.com/user-attachments/assets/98804645-c8a3-4ec1-88a0-767781e0fb95)
+![image](https://github.com/user-attachments/assets/2d6788e5-ee2a-4e42-8fbb-4ba1d484c312)
 ![image](https://img.shields.io/github/license/RiadOliveira/WebShooter)
 
 <br/>
