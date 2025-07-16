@@ -4,7 +4,7 @@
   A high-performance archiving utility designed for Unix-like systems that leverages multi-threading with the Producer-Consumer pattern to optimize file archiving and unarchiving operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
 </p>
 
-![image](https://github.com/user-attachments/assets/4e94c532-d9c3-4786-89b3-afd530cf4f01)
+![image](https://github.com/user-attachments/assets/98804645-c8a3-4ec1-88a0-767781e0fb95)
 ![image](https://img.shields.io/github/license/RiadOliveira/WebShooter)
 
 <br/>
