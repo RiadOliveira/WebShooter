@@ -4,8 +4,8 @@
   WebShooter is a high-performance archiving utility designed for Unix-like systems, leveraging multi-threading to optimize operations. Developed as part of my Computer Science final project, this tool significantly outperforms traditional archivers like <code>tar</code> and <code>cpio</code> through parallel processing.
 </p>
 
-![image](https://github.com/user-attachments/assets/2d6788e5-ee2a-4e42-8fbb-4ba1d484c312)
-![image](https://img.shields.io/github/license/RiadOliveira/WebShooter)
+![Preview](https://github.com/user-attachments/assets/2d6788e5-ee2a-4e42-8fbb-4ba1d484c312)
+![License](https://img.shields.io/github/license/RiadOliveira/WebShooter)
 
 <br/>
 
@@ -240,7 +240,8 @@ This project is MIT Licensed. See <a href="https://github.com/RiadOliveira/WebSh
 ## 🌐 Socials
 
 <div id="socials">
-  <a href = "mailto:riad.oliveira@hotmail.com"><img class="badge" src="https://img.shields.io/badge/Microsoft_Outlook-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white" target="_blank"/></a>
-  <a href = "mailto:riad.oliveira@gmail.com"><img class="badge" src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" target="_blank"/></a>
-  <a href="https://www.linkedin.com/in/ríad-oliveira" target="_blank"><img class="badge" src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"/></a>
+  <a href="https://portfolio-riadoliveira.vercel.app"><img class="badge" src="https://img.shields.io/badge/Portfolio-%23000000.svg?style=for-the-badge&logo=firefox&logoColor=#FF7139" alt="Portfolio" target="_blank"></a>
+  <a href = "mailto:riad.oliveira@hotmail.com"><img class="badge" src="https://img.shields.io/badge/Microsoft_Outlook-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white" alt="E-mail" target="_blank"/></a>
+  <a href = "mailto:riad.oliveira@gmail.com"><img class="badge" src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" target="_blank"/></a>
+  <a href="https://www.linkedin.com/in/ríad-oliveira" target="_blank"><img class="badge" src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="Linkedin" target="_blank"/></a>
 </div>
