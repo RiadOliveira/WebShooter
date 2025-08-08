@@ -33,6 +33,7 @@ Contents
   * [📤 Unweb (Unarchiving) Examples](#example-unweb)
 * [📊 Performance Benchmarks](#performance)
 * [📚 Academic Article](#article)
+* [📜 Certification](#certification)
 * [📝 License](#license)
 * [👨‍💻 Author](#author)
 * [🌐 Socials](#socials)
@@ -221,6 +222,17 @@ Benchmarked using [hyperfine](https://github.com/sharkdp/hyperfine) against stan
 
 <h2 id="article">📚 Academic Article</h2>
 This project was developed as part of a Computer Science undergraduate thesis. For full methodology and benchmarking details: <a href="https://drive.google.com/file/d/1WLR53rfo7fqLqL0qZlNOb7oieLnb9AQq/view?usp=sharing">📖 Read the full article</a> <i>(PDF, 17 pages - in Brazilian Portuguese).</i>
+
+<h2 id="certification">📜 Certification</h2>
+
+This software is officially registered with the **Brazilian National Institute of Industrial Property (INPI)** as a Computer Program:
+
+- **Certificate Type**: Certificate of Registration of a Computer Program
+- **Registration Number**: BR512025003549-7
+- **Issuance Date**: August 2025
+- **Expiration Date**: January 2076
+- **Certificate URL**: [WebShooter Certificate](https://drive.google.com/file/d/1mg--2hmqUW8yS1cTt4P5Mp0Z2YdSXBxl/view?usp=sharing)
+- **Issuing Authority**: [INPI Brazil](https://www.gov.br/inpi/en)
 
 <h2 id="license">📝 License</h2>
 This project is MIT Licensed. See <a href="https://github.com/RiadOliveira/WebShooter/blob/main/LICENSE">LICENSE</a> file for more details.
